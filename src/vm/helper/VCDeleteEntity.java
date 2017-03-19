@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * Created by huxia on 2017/3/15.
+ * 完成于 2017/3/19 BY 胡箫
  */
 public class VCDeleteEntity extends VCTaskBase {
     /**

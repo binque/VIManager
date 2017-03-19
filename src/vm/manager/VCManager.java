@@ -3,6 +3,10 @@
  */
  package vm.manager;
 
+import vm.helper.VCCloneVM;
+import vm.helper.VCConfigVM;
+import vm.helper.VCDeleteEntity;
+
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 
@@ -21,6 +25,18 @@ public class VCManager {
      */
     @WebMethod
     public String ChangeConfig(String VMID, String CPU, String RAM, String Disk, String NetLimit) {
+        try {
+            if (CPU == "low" || CPU == "normal" || CPU == "high") {
+                VCConfigVM.run(VMID, "update", "cpu", CPU, "", "");
+            }
+            if (RAM == "low" || RAM == "normal" || RAM == "high") {
+                VCConfigVM.run(VMID, "update", "memory", RAM, "", "");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "error :" + e.getMessage();
+        }
         return null;
     }
 
@@ -32,18 +48,35 @@ public class VCManager {
      */
     @WebMethod
     public String BasicOps(String VMID, String Op) {
+        switch (Op)
+        {
+            case "delete":
+            try {
+                VCDeleteEntity.run(VMID);
+                return "success finished.";
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "error :" + e.getMessage();
+            }
+        }
         return null;
     }
 
     /**
      * @param templateID 模板名称
      * @param VMID       虚拟机名称
-     * @return 如果成功则返回null，否则返回表示错误信息的字符串
+     * @return 如果任务执行完成（不意味着虚拟机创建完成），返回以success开始的字符串；否则返回以error开始，表示错误信息的字符串
      * @功能描述 从模板创建一个虚拟机
      */
     @WebMethod
     public String CreateFromTemplate(String templateID, String VMID) {
-        return null;
+        try {
+            VCCloneVM.run("Datacenter", "Datacenter/vm/"+templateID, VMID);
+            return "success finished.";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "error :" + e.getMessage();
+        }
     }
 
     /**

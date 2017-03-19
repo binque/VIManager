@@ -151,8 +151,121 @@ public class VCHelper {
         return token;
     }
 
+    public static String populate(final RetrieveResult rslts, final List<ObjectContent> listobjcontent) {
+        String token = null;
+        if (rslts != null) {
+            token = rslts.getToken();
+            listobjcontent.addAll(rslts.getObjects());
+        }
+        return token;
+    }
+
     public static Map<String, ManagedObjectReference> inContainerByType(ManagedObjectReference container, String morefType) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
         return inContainerByType(container, morefType, new RetrieveOptions());
+    }
+
+    /**
+     * @功能描述 检索当前MOR的属性
+     * @param entityMor 所要检索的实体的MOR
+     * @param props 检索的属性集合
+     * @return 返回属性名和其相应属性的Map
+     * @throws InvalidPropertyFaultMsg 该属性不存在
+     */
+    public static Map<String, Object> entityProps(ManagedObjectReference entityMor, String[] props)
+            throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+
+        init();
+
+        final HashMap<String, Object> retVal = new HashMap<String, Object>();
+
+        // Create PropertyFilterSpec using the PropertySpec and ObjectPec
+        PropertyFilterSpec[] propertyFilterSpecs = {
+                new PropertyFilterSpecBuilder()
+                        .propSet(
+                                // Create Property Spec
+                                new PropertySpecBuilder()
+                                        .all(Boolean.FALSE)
+                                        .type(entityMor.getType())
+                                        .pathSet(props)
+                        )
+                        .objectSet(
+                        // Now create Object Spec
+                        new ObjectSpecBuilder()
+                                .obj(entityMor)
+                )
+        };
+
+        List<ObjectContent> oCont =
+                vimPort.retrievePropertiesEx(serviceContent.getPropertyCollector(),
+                        Arrays.asList(propertyFilterSpecs), new RetrieveOptions()).getObjects();
+
+        if (oCont != null) {
+            for (ObjectContent oc : oCont) {
+                List<DynamicProperty> dps = oc.getPropSet();
+                for (DynamicProperty dp : dps) {
+                    retVal.put(dp.getName(), dp.getVal());
+                }
+            }
+        }
+        return retVal;
+    }
+
+    public static Map<ManagedObjectReference, Map<String, Object>> entityProps(
+            List<ManagedObjectReference> entityMors, String[] props)
+            throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+        init();
+
+        Map<ManagedObjectReference, Map<String, Object>> retVal =
+                new HashMap<ManagedObjectReference, Map<String, Object>>();
+        // Create PropertyFilterSpec
+        PropertyFilterSpecBuilder propertyFilterSpec = new PropertyFilterSpecBuilder();
+        Map<String, String> typesCovered = new HashMap<String, String>();
+
+        for (ManagedObjectReference mor : entityMors) {
+            if (!typesCovered.containsKey(mor.getType())) {
+                // Create & add new property Spec
+                propertyFilterSpec.propSet(
+                        new PropertySpecBuilder()
+                                .all(Boolean.FALSE)
+                                .type(mor.getType())
+                                .pathSet(props)
+                );
+                typesCovered.put(mor.getType(), "");
+            }
+            // Now create & add Object Spec
+            propertyFilterSpec.objectSet(
+                    new ObjectSpecBuilder().obj(mor)
+            );
+        }
+        List<PropertyFilterSpec> propertyFilterSpecs =
+                new ArrayList<PropertyFilterSpec>();
+        propertyFilterSpecs.add(propertyFilterSpec);
+
+        RetrieveResult rslts =
+                vimPort.retrievePropertiesEx(serviceContent.getPropertyCollector(),
+                        propertyFilterSpecs, new RetrieveOptions());
+
+        List<ObjectContent> listobjcontent = new ArrayList<ObjectContent>();
+        String token = populate(rslts,listobjcontent);
+        while (token != null && !token.isEmpty()) {
+            rslts =
+                    vimPort.continueRetrievePropertiesEx(
+                            serviceContent.getPropertyCollector(), token);
+
+            token = populate(rslts,listobjcontent);
+        }
+
+        for (ObjectContent oc : listobjcontent) {
+            List<DynamicProperty> dps = oc.getPropSet();
+            Map<String, Object> propMap = new HashMap<String, Object>();
+            if (dps != null) {
+                for (DynamicProperty dp : dps) {
+                    propMap.put(dp.getName(), dp.getVal());
+                }
+            }
+            retVal.put(oc.getObj(), propMap);
+        }
+        return retVal;
     }
 
     /**
