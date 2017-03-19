@@ -1,7 +1,7 @@
 package vm.manager;
 
 import vm.helper.VCClientSession;
-import vm.helper.VCCloneVM;
+import vm.helper.VCDeleteEntity;
 
 /*
  * Created by huxia on 2017/3/13.
@@ -11,7 +11,11 @@ public class ClientTest {
         // 连接vcenter与中断连接的测试代码
         try{
             VCClientSession.Connect();
-            VCCloneVM.run("Datacenter", "Datacenter/vm/Temptest", "CloneTest");
+            // 克隆虚拟机的测试代码
+            // VCCloneVM.run("Datacenter", "Datacenter/vm/Temptest", "CloneTest");
+
+            // 删除被管实体的测试代码
+            VCDeleteEntity.run("Temptest");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

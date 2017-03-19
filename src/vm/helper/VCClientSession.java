@@ -14,13 +14,12 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 /**
- * @功能描述：客户程序的登陆、登出和认证
+ * @功能描述 客户程序的登陆、登出和认证
  */
 public class VCClientSession {
     private static final String url = "https://10.251.0.20:8000/sdk";
@@ -101,7 +100,7 @@ public class VCClientSession {
     }
 
     /**
-     * @功能描述：连接认证
+     * @功能描述 连接认证
      */
     public static void Connect() throws RuntimeFaultFaultMsg, InvalidLoginFaultMsg, InvalidLocaleFaultMsg, KeyManagementException, NoSuchAlgorithmException {
         HostnameVerifier hv = (s, sslSession) -> true;
@@ -131,7 +130,7 @@ public class VCClientSession {
     }
 
     /**
-     * @功能描述：断开连接
+     * @功能描述 断开连接
      */
     public static void Disconnect() throws RuntimeFaultFaultMsg {
         if (isConnected) {
@@ -141,7 +140,7 @@ public class VCClientSession {
     }
 
     /**
-     * @功能描述：打印错误信息
+     * @功能描述 打印错误信息
      */
     private static void printSoapFaultException(SOAPFaultException sfe) {
         System.out.println("Soap fault: ");
@@ -151,41 +150,6 @@ public class VCClientSession {
         if (sfe.getFault().getFaultString() != null) {
             System.out.println("Message: " + sfe.getFault().getFaultString());
         }
-    }
-
-    /**
-     * @param listpfs 属性过滤器集合
-     * @功能描述：根据属性检索要查询的对象信息
-     */
-    public static List<ObjectContent> RetrievePropertiesAllObjects(List<PropertyFilterSpec> listpfs) {
-        RetrieveOptions propObjectRetrieveOpts = new RetrieveOptions();
-        List<ObjectContent> listobjcontent = new ArrayList<>();
-        try {
-            RetrieveResult rslts = vimPort.retrievePropertiesEx(propCollectorRef, listpfs, propObjectRetrieveOpts);
-            if (rslts != null && rslts.getObjects() != null && !rslts.getObjects().isEmpty()) {
-                listobjcontent.addAll(rslts.getObjects());
-            }
-            String token = null;
-            if (rslts != null && rslts.getToken() != null) {
-                token = rslts.getToken();
-            }
-            while (token != null && !token.isEmpty()) {
-                rslts = vimPort.continueRetrievePropertiesEx(propCollectorRef, token);
-                token = null;
-                if (rslts != null) {
-                    token = rslts.getToken();
-                    if (rslts.getObjects() != null && !rslts.getObjects().isEmpty()) {
-                        listobjcontent.addAll(rslts.getObjects());
-                    }
-                }
-            }
-        } catch (SOAPFaultException sfe) {
-            printSoapFaultException(sfe);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return listobjcontent;
     }
 
     public static Object[] WaitForValues(ManagedObjectReference objmor, String[] filterProps, String[] endWaitProps, Object[][] expectedVals) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg, InvalidCollectorVersionFaultMsg {

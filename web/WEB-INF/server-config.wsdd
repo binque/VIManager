@@ -40,6 +40,13 @@
     <parameter name="scope" value="Application"/>
     <parameter name="className" value="org.apache.axis.monitor.SOAPMonitorService"/>
   </service>
+  <!-- 以下是VCManager服务注册 -->
+  <service name="VCManagerService" provider="java:RPC" style="document" use="literal">
+    <parameter name="className" value="vm.manager.VCManager" />
+    <parameter name="allowedMethods" value="*" />
+    <parameter name="scope" value="Application" />
+    <namespace>http://vm.manager.buaa.edu.cn/VCManager</namespace>
+  </service>
     <handler name="soapmonitor" type="java:org.apache.axis.handlers.SOAPMonitorHandler">
     <parameter name="wsdlURL" value="/axis/SOAPMonitorService-impl.wsdl"/>
     <parameter name="serviceName" value="SOAPMonitorService"/>

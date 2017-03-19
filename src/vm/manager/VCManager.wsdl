@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://manager.vm" xmlns:impl="http://manager.vm" xmlns:intf="http://manager.vm" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+ <wsdl:types>
+  <schema elementFormDefault="qualified" targetNamespace="http://manager.vm" xmlns="http://www.w3.org/2001/XMLSchema">
+   <element name="templateID" type="xsd:string"/>
+   <element name="VMID" type="xsd:string"/>
+   <element name="CreateFromTemplateReturn" type="xsd:string"/>
+   <element name="VMID1" type="xsd:string"/>
+   <element name="op" type="xsd:string"/>
+   <element name="snapshotname" type="xsd:string"/>
+   <element name="SnapShotOpsReturn" type="xsd:string"/>
+   <element name="VMID2" type="xsd:string"/>
+   <element name="targetDir" type="xsd:string"/>
+   <element name="ExportVMReturn" type="xsd:string"/>
+   <element name="VMID3" type="xsd:string"/>
+   <element name="GetVMInforReturn" type="xsd:string"/>
+   <element name="VMID4" type="xsd:string"/>
+   <element name="Op" type="xsd:string"/>
+   <element name="BasicOpsReturn" type="xsd:string"/>
+   <element name="VMID5" type="xsd:string"/>
+   <element name="filePathLocal" type="xsd:string"/>
+   <element name="filePathInGuest" type="xsd:string"/>
+   <element name="uploadFileReturn" type="xsd:string"/>
+   <element name="VMID6" type="xsd:string"/>
+   <element name="CPU" type="xsd:string"/>
+   <element name="RAM" type="xsd:string"/>
+   <element name="Disk" type="xsd:string"/>
+   <element name="NetLimit" type="xsd:string"/>
+   <element name="ChangeConfigReturn" type="xsd:string"/>
+   <element name="VMID7" type="xsd:string"/>
+   <element name="PerfUnit" type="xsd:string"/>
+   <element name="GetPerfReturn" type="xsd:string"/>
+   <element name="VMID8" type="xsd:string"/>
+   <element name="fileDir" type="xsd:string"/>
+   <element name="args" type="xsd:string"/>
+   <element name="RunGuestProgramReturn" type="xsd:string"/>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="ExportVMResponse">
+
+      <wsdl:part element="impl:ExportVMReturn" name="ExportVMReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="CreateFromTemplateRequest">
+
+      <wsdl:part element="impl:templateID" name="templateID"/>
+
+      <wsdl:part element="impl:VMID" name="VMID"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="CreateFromTemplateResponse">
+
+      <wsdl:part element="impl:CreateFromTemplateReturn" name="CreateFromTemplateReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="ChangeConfigResponse">
+
+      <wsdl:part element="impl:ChangeConfigReturn" name="ChangeConfigReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="GetVMInforRequest">
+
+      <wsdl:part element="impl:VMID3" name="VMID"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="BasicOpsResponse">
+
+      <wsdl:part element="impl:BasicOpsReturn" name="BasicOpsReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="uploadFileResponse">
+
+      <wsdl:part element="impl:uploadFileReturn" name="uploadFileReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="RunGuestProgramRequest">
+
+      <wsdl:part element="impl:VMID8" name="VMID"/>
+
+      <wsdl:part element="impl:fileDir" name="fileDir"/>
+
+      <wsdl:part element="impl:args" name="args"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="ExportVMRequest">
+
+      <wsdl:part element="impl:VMID2" name="VMID"/>
+
+      <wsdl:part element="impl:targetDir" name="targetDir"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="GetVMInforResponse">
+
+      <wsdl:part element="impl:GetVMInforReturn" name="GetVMInforReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="RunGuestProgramResponse">
+
+      <wsdl:part element="impl:RunGuestProgramReturn" name="RunGuestProgramReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="uploadFileRequest">
+
+      <wsdl:part element="impl:VMID5" name="VMID"/>
+
+      <wsdl:part element="impl:filePathLocal" name="filePathLocal"/>
+
+      <wsdl:part element="impl:filePathInGuest" name="filePathInGuest"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="GetPerfRequest">
+
+      <wsdl:part element="impl:VMID7" name="VMID"/>
+
+      <wsdl:part element="impl:PerfUnit" name="PerfUnit"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="GetPerfResponse">
+
+      <wsdl:part element="impl:GetPerfReturn" name="GetPerfReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="SnapShotOpsRequest">
+
+      <wsdl:part element="impl:VMID1" name="VMID"/>
+
+      <wsdl:part element="impl:op" name="op"/>
+
+      <wsdl:part element="impl:snapshotname" name="snapshotname"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="BasicOpsRequest">
+
+      <wsdl:part element="impl:VMID4" name="VMID"/>
+
+      <wsdl:part element="impl:Op" name="Op"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="SnapShotOpsResponse">
+
+      <wsdl:part element="impl:SnapShotOpsReturn" name="SnapShotOpsReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="ChangeConfigRequest">
+
+      <wsdl:part element="impl:VMID6" name="VMID"/>
+
+      <wsdl:part element="impl:CPU" name="CPU"/>
+
+      <wsdl:part element="impl:RAM" name="RAM"/>
+
+      <wsdl:part element="impl:Disk" name="Disk"/>
+
+      <wsdl:part element="impl:NetLimit" name="NetLimit"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="VCManager">
+
+      <wsdl:operation name="CreateFromTemplate" parameterOrder="templateID VMID">
+
+         <wsdl:input message="impl:CreateFromTemplateRequest" name="CreateFromTemplateRequest"/>
+
+         <wsdl:output message="impl:CreateFromTemplateResponse" name="CreateFromTemplateResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="SnapShotOps" parameterOrder="VMID op snapshotname">
+
+         <wsdl:input message="impl:SnapShotOpsRequest" name="SnapShotOpsRequest"/>
+
+         <wsdl:output message="impl:SnapShotOpsResponse" name="SnapShotOpsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="ExportVM" parameterOrder="VMID targetDir">
+
+         <wsdl:input message="impl:ExportVMRequest" name="ExportVMRequest"/>
+
+         <wsdl:output message="impl:ExportVMResponse" name="ExportVMResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="GetVMInfor" parameterOrder="VMID">
+
+         <wsdl:input message="impl:GetVMInforRequest" name="GetVMInforRequest"/>
+
+         <wsdl:output message="impl:GetVMInforResponse" name="GetVMInforResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="BasicOps" parameterOrder="VMID Op">
+
+         <wsdl:input message="impl:BasicOpsRequest" name="BasicOpsRequest"/>
+
+         <wsdl:output message="impl:BasicOpsResponse" name="BasicOpsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="uploadFile" parameterOrder="VMID filePathLocal filePathInGuest">
+
+         <wsdl:input message="impl:uploadFileRequest" name="uploadFileRequest"/>
+
+         <wsdl:output message="impl:uploadFileResponse" name="uploadFileResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="ChangeConfig" parameterOrder="VMID CPU RAM Disk NetLimit">
+
+         <wsdl:input message="impl:ChangeConfigRequest" name="ChangeConfigRequest"/>
+
+         <wsdl:output message="impl:ChangeConfigResponse" name="ChangeConfigResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="GetPerf" parameterOrder="VMID PerfUnit">
+
+         <wsdl:input message="impl:GetPerfRequest" name="GetPerfRequest"/>
+
+         <wsdl:output message="impl:GetPerfResponse" name="GetPerfResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="RunGuestProgram" parameterOrder="VMID fileDir args">
+
+         <wsdl:input message="impl:RunGuestProgramRequest" name="RunGuestProgramRequest"/>
+
+         <wsdl:output message="impl:RunGuestProgramResponse" name="RunGuestProgramResponse"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="VCManagerSoapBinding" type="impl:VCManager">
+
+      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="CreateFromTemplate">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="CreateFromTemplateRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="CreateFromTemplateResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="SnapShotOps">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="SnapShotOpsRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="SnapShotOpsResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="ExportVM">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="ExportVMRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="ExportVMResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="GetVMInfor">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="GetVMInforRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="GetVMInforResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="BasicOps">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="BasicOpsRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="BasicOpsResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="uploadFile">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="uploadFileRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="uploadFileResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="ChangeConfig">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="ChangeConfigRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="ChangeConfigResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="GetPerf">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="GetPerfRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="GetPerfResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="RunGuestProgram">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="RunGuestProgramRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="RunGuestProgramResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="VCManagerService">
+
+      <wsdl:port binding="impl:VCManagerSoapBinding" name="VCManager">
+
+         <wsdlsoap:address location="http://localhost:8080//services/VCManager"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+</wsdl:definitions>
