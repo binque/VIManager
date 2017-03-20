@@ -6,6 +6,7 @@
 import vm.helper.VCCloneVM;
 import vm.helper.VCConfigVM;
 import vm.helper.VCDeleteEntity;
+import vm.helper.VCVMPower;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;
@@ -48,7 +49,7 @@ public class VCManager {
      */
     @WebMethod
     public String BasicOps(String VMID, String Op) {
-        switch (Op)
+        switch (Op.toLowerCase())
         {
             case "delete":
             try {
@@ -58,6 +59,40 @@ public class VCManager {
                 e.printStackTrace();
                 return "error :" + e.getMessage();
             }
+            case "poweron":
+            	try{
+            		VCVMPower vm=new VCVMPower();
+            		vm.setVmName(VMID);
+            		vm.setOperation("poweron");
+            		vm.run();
+            		return "success finished.";
+            	}catch(Exception e){
+                    e.printStackTrace();
+                    return "error :" + e.getMessage();
+                }
+            case "poweroff":
+            	try{
+            		VCVMPower vm=new VCVMPower();
+            		vm.setVmName(VMID);
+            		vm.setOperation("poweroff");
+            		vm.run();
+            		return "success finished.";
+            	}catch(Exception e){
+                    e.printStackTrace();
+                    return "error :" + e.getMessage();
+                }
+            	
+            case "reboot":
+            	try{
+            		VCVMPower vm=new VCVMPower();
+            		vm.setVmName(VMID);
+            		vm.setOperation("reboot");
+            		vm.run();
+            		return "success finished.";
+            	}catch(Exception e){
+                    e.printStackTrace();
+                    return "error :" + e.getMessage();
+                }
         }
         return null;
     }
