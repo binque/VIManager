@@ -118,6 +118,14 @@ public class VCHelper {
         return toMap(retrieveResult);
     }
 
+    public static RetrieveResult containerViewByType(
+            final ManagedObjectReference container,
+            final String morefType,
+            final RetrieveOptions retrieveOptions
+    ) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+        return containerViewByType(container, morefType, retrieveOptions, "name");
+    }
+
     private static Map<String, ManagedObjectReference> toMap(RetrieveResult retrieveResult) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
         final Map<String, ManagedObjectReference> tgetMoref = new HashMap<>();
         String token = null;

@@ -1,7 +1,7 @@
 <component name="ArtifactManager">
-  <artifact type="exploded-war" name="VIManager:war exploded">
+  <artifact type="war" name="VIManager:war exploded">
     <output-path>$PROJECT_DIR$/out/artifacts/VIManager_war_exploded</output-path>
-    <root id="root">
+    <root id="archive" name="VIManager_war exploded.war">
       <element id="javaee-facet-resources" facet="VIManager/web/Web" />
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">

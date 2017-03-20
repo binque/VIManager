@@ -179,6 +179,16 @@ public class VCConfigVM extends VCTaskBase {
         return dsName;
     }
 
+    /**
+     *
+     * @param virtualMachine 虚拟机的MOR
+     * @param vmName 虚拟机名称
+     * @param operation 操作名称，对于磁盘可以是 add/remove 两者之一
+     * @param value 磁盘名称，要增加的或者要移除的磁盘名称，无需后缀名
+     * @param disksize 磁盘大小，单位为MB
+     * @param diskmode 磁盘模式
+     * @return 返回磁盘设备配置SPEC
+     */
     private static VirtualDeviceConfigSpec getDiskDeviceConfigSpec(ManagedObjectReference virtualMachine, String vmName, String operation, String value, String disksize, String diskmode)
             throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
         String ops = operation;
@@ -209,8 +219,7 @@ public class VCConfigVM extends VCTaskBase {
             disk.setKey(-1);
 
             diskSpec.setOperation(VirtualDeviceConfigSpecOperation.ADD);
-            diskSpec
-                    .setFileOperation(VirtualDeviceConfigSpecFileOperation.CREATE);
+            diskSpec.setFileOperation(VirtualDeviceConfigSpecFileOperation.CREATE);
             diskSpec.setDevice(disk);
         } else if (ops.equalsIgnoreCase("Remove")) {
             VirtualDisk disk = null;
@@ -226,8 +235,7 @@ public class VCConfigVM extends VCTaskBase {
             }
             if (disk != null) {
                 diskSpec.setOperation(VirtualDeviceConfigSpecOperation.REMOVE);
-                diskSpec
-                        .setFileOperation(VirtualDeviceConfigSpecFileOperation.DESTROY);
+                diskSpec.setFileOperation(VirtualDeviceConfigSpecFileOperation.DESTROY);
                 diskSpec.setDevice(disk);
             } else {
                 System.out.println("No device found " + value);
