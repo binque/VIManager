@@ -41,7 +41,7 @@
     <parameter name="className" value="org.apache.axis.monitor.SOAPMonitorService"/>
   </service>
   <!-- 以下是VCManager服务注册 -->
-  <service name="VCManagerService" provider="java:RPC" style="document" use="literal">
+  <service name="VCManagerService" provider="java:RPC" style="" use="literal">
     <parameter name="className" value="vm.manager.VCManager" />
     <parameter name="allowedMethods" value="*" />
     <parameter name="scope" value="Application" />

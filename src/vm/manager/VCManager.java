@@ -3,13 +3,12 @@
  */
  package vm.manager;
 
-import vm.helper.VCCloneVM;
-import vm.helper.VCConfigVM;
-import vm.helper.VCDeleteEntity;
-import vm.helper.VCVMPower;
+import vm.helper.*;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;
+
+import static vm.helper.VCClientSession.*;
 
 /**
  * @功能描述 web服务中暴露的接口，调用下列接口进行vsphere管理
@@ -27,18 +26,25 @@ public class VCManager {
     @WebMethod
     public String ChangeConfig(String VMID, String CPU, String RAM, String Disk, String NetLimit) {
         try {
-            if (CPU == "low" || CPU == "normal" || CPU == "high") {
+            if (VMID != null && !VMID.isEmpty() && (CPU == "low" || CPU == "normal" || CPU == "high")) {
                 VCConfigVM.run(VMID, "update", "cpu", CPU, "", "");
             }
-            if (RAM == "low" || RAM == "normal" || RAM == "high") {
+            if (VMID != null && !VMID.isEmpty() && (RAM == "low" || RAM == "normal" || RAM == "high")) {
                 VCConfigVM.run(VMID, "update", "memory", RAM, "", "");
             }
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             return "error :" + e.getMessage();
+        } finally {
+            try {
+                Disconnect();
+                return "success finished.";
+            } catch (Throwable e) {
+                e.printStackTrace();
+                return "error :" + e.getMessage();
+            }
         }
-        return null;
     }
 
     /**
@@ -49,52 +55,60 @@ public class VCManager {
      */
     @WebMethod
     public String BasicOps(String VMID, String Op) {
-        switch (Op.toLowerCase())
-        {
-            case "delete":
-            try {
-                VCDeleteEntity.run(VMID);
-                return "success finished.";
-            } catch (Exception e) {
-                e.printStackTrace();
-                return "error :" + e.getMessage();
+        if (VMID != null && Op != null && (!(VMID.isEmpty() || Op.isEmpty()))) {
+            switch (Op.toLowerCase()) {
+                case "delete":
+                    try {
+                        VCDeleteEntity.run(VMID);
+                        Disconnect();
+                        return "success finished.";
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                        return "error :" + e.getMessage();
+                    }
+                case "poweron":
+                    try {
+                        VCVMPower vm = new VCVMPower();
+                        vm.setVmName(VMID);
+                        vm.setOperation("poweron");
+                        vm.run();
+                        Disconnect();
+                        return "success finished.";
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                        return "error :" + e.getMessage();
+                    }
+                case "poweroff":
+                    try {
+                        VCVMPower vm = new VCVMPower();
+                        vm.setVmName(VMID);
+                        vm.setOperation("poweroff");
+                        vm.run();
+                        Disconnect();
+                        return "success finished.";
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                        return "error :" + e.getMessage();
+                    }
+
+                case "reboot":
+                    try {
+                        VCVMPower vm = new VCVMPower();
+                        vm.setVmName(VMID);
+                        vm.setOperation("reboot");
+                        vm.run();
+                        Disconnect();
+                        return "success finished.";
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                        return "error :" + e.getMessage();
+                    }
+                default:
+                    return "error :parmeter cannot resolved.";
             }
-            case "poweron":
-            	try{
-            		VCVMPower vm=new VCVMPower();
-            		vm.setVmName(VMID);
-            		vm.setOperation("poweron");
-            		vm.run();
-            		return "success finished.";
-            	}catch(Exception e){
-                    e.printStackTrace();
-                    return "error :" + e.getMessage();
-                }
-            case "poweroff":
-            	try{
-            		VCVMPower vm=new VCVMPower();
-            		vm.setVmName(VMID);
-            		vm.setOperation("poweroff");
-            		vm.run();
-            		return "success finished.";
-            	}catch(Exception e){
-                    e.printStackTrace();
-                    return "error :" + e.getMessage();
-                }
-            	
-            case "reboot":
-            	try{
-            		VCVMPower vm=new VCVMPower();
-            		vm.setVmName(VMID);
-            		vm.setOperation("reboot");
-            		vm.run();
-            		return "success finished.";
-            	}catch(Exception e){
-                    e.printStackTrace();
-                    return "error :" + e.getMessage();
-                }
+        } else {
+            return "parameter cannot be null.";
         }
-        return null;
     }
 
     /**
@@ -105,12 +119,24 @@ public class VCManager {
      */
     @WebMethod
     public String CreateFromTemplate(String templateID, String VMID) {
-        try {
-            VCCloneVM.run("Datacenter", "Datacenter/vm/"+templateID, VMID);
-            return "success finished.";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "error :" + e.getMessage();
+        if (templateID != null && !templateID.isEmpty() && VMID != null && !VMID.isEmpty()) {
+            try {
+                VCCloneVM.run("Datacenter", "Datacenter/vm/" + templateID, VMID);
+                return "success finished.";
+            } catch (Throwable e) {
+                e.printStackTrace();
+                return "error :" + e.getMessage();
+            } finally {
+                try {
+                    Disconnect();
+                    return "success finished.";
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    return "error :" + e.getMessage();
+                }
+            }
+        } else {
+            return "parameter cannot be null.";
         }
     }
 
