@@ -1,10 +1,7 @@
 package vm.manager;
 
-import com.vmware.vim25.ManagedObjectReference;
 import vm.helper.VCClientSession;
-import vm.helper.VCHelper;
-
-import java.util.Map;
+import vm.helper.VCGetVMList;
 
 /*
  * Created by huxia on 2017/3/13.
@@ -23,11 +20,9 @@ public class ClientTest {
             // 重新配置被管实体的测试代码
             // VCConfigVM.run("CloneTest", "update", "memory", "normal", "", "");
 
-            Map map = VCHelper.inContainerByType(VCClientSession.getServiceContent().getRootFolder(), "VirtualMachine");
-            System.out.printf("map size is %s\n", map.size());
-            ManagedObjectReference vm = (ManagedObjectReference) map.get("PowerOnTest");
-            System.out.printf("vm type is %s, its value is %s.\n", vm.getType(), vm.getValue());
-            System.out.printf("its class is %s", vm.getClass());
+            // 获取虚拟机名称列表
+            String vmList = VCGetVMList.run("Datacenter");
+            System.out.printf(vmList);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

@@ -8,7 +8,7 @@ import vm.helper.*;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 
-import static vm.helper.VCClientSession.*;
+import static vm.helper.VCClientSession.Disconnect;
 
 /**
  * @功能描述 web服务中暴露的接口，调用下列接口进行vsphere管理
@@ -25,26 +25,22 @@ public class VCManager {
      */
     @WebMethod
     public String ChangeConfig(String VMID, String CPU, String RAM, String Disk, String NetLimit) {
+        String retVal = "";
+
         try {
-            if (VMID != null && !VMID.isEmpty() && (CPU == "low" || CPU == "normal" || CPU == "high")) {
+            if (VMID != null && !VMID.isEmpty() && CPU.equals("low") || CPU.equals("normal") || CPU.equals("high")) {
                 VCConfigVM.run(VMID, "update", "cpu", CPU, "", "");
             }
-            if (VMID != null && !VMID.isEmpty() && (RAM == "low" || RAM == "normal" || RAM == "high")) {
+            if (VMID != null && !VMID.isEmpty() && RAM.equals("low") || RAM.equals("normal") || RAM.equals("high")) {
                 VCConfigVM.run(VMID, "update", "memory", RAM, "", "");
             }
-
         } catch (Throwable e) {
             e.printStackTrace();
-            return "error :" + e.getMessage();
+            retVal =  "error :" + e.getMessage();
         } finally {
-            try {
-                Disconnect();
-                return "success finished.";
-            } catch (Throwable e) {
-                e.printStackTrace();
-                return "error :" + e.getMessage();
-            }
+            retVal += disconnect();
         }
+        return retVal;
     }
 
     /**
@@ -55,60 +51,52 @@ public class VCManager {
      */
     @WebMethod
     public String BasicOps(String VMID, String Op) {
+        String retVal = "";
         if (VMID != null && Op != null && (!(VMID.isEmpty() || Op.isEmpty()))) {
-            switch (Op.toLowerCase()) {
-                case "delete":
-                    try {
+            try {
+                switch (Op.toLowerCase()) {
+                    case "delete": {
                         VCDeleteEntity.run(VMID);
                         Disconnect();
-                        return "success finished.";
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                        return "error :" + e.getMessage();
+                        retVal = "success finished.";
                     }
-                case "poweron":
-                    try {
+                    case "poweron": {
                         VCVMPower vm = new VCVMPower();
                         vm.setVmName(VMID);
                         vm.setOperation("poweron");
                         vm.run();
                         Disconnect();
-                        return "success finished.";
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                        return "error :" + e.getMessage();
+                        retVal = "success finished.";
                     }
-                case "poweroff":
-                    try {
+                    case "poweroff": {
                         VCVMPower vm = new VCVMPower();
                         vm.setVmName(VMID);
                         vm.setOperation("poweroff");
                         vm.run();
                         Disconnect();
-                        return "success finished.";
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                        return "error :" + e.getMessage();
+                        retVal = "success finished.";
                     }
-
-                case "reboot":
-                    try {
+                    case "reboot": {
                         VCVMPower vm = new VCVMPower();
                         vm.setVmName(VMID);
                         vm.setOperation("reboot");
                         vm.run();
                         Disconnect();
-                        return "success finished.";
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                        return "error :" + e.getMessage();
+                        retVal = "success finished.";
                     }
-                default:
-                    return "error :parmeter cannot resolved.";
+                    default:
+                        retVal = "error :parmeter cannot resolved.";
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+                retVal += "error :" + e.getMessage();
+            }finally {
+                retVal += disconnect();
             }
         } else {
-            return "parameter cannot be null.";
+            retVal = "error :parameter cannot be null.";
         }
+        return retVal;
     }
 
     /**
@@ -119,25 +107,21 @@ public class VCManager {
      */
     @WebMethod
     public String CreateFromTemplate(String templateID, String VMID) {
+        String retVal = "";
         if (templateID != null && !templateID.isEmpty() && VMID != null && !VMID.isEmpty()) {
             try {
                 VCCloneVM.run("Datacenter", "Datacenter/vm/" + templateID, VMID);
-                return "success finished.";
+                retVal = "success finished.";
             } catch (Throwable e) {
                 e.printStackTrace();
-                return "error :" + e.getMessage();
+                retVal = "error :" + e.getMessage();
             } finally {
-                try {
-                    Disconnect();
-                    return "success finished.";
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    return "error :" + e.getMessage();
-                }
+                retVal += disconnect();
             }
         } else {
-            return "parameter cannot be null.";
+            retVal = "error :parameter cannot be null.";
         }
+        return retVal;
     }
 
     /**
@@ -203,7 +187,38 @@ public class VCManager {
      * @功能描述 将文件上传到虚拟机中
      */
     @WebMethod
-    public String uploadFile(String VMID, String filePathLocal, String filePathInGuest) {
+    public String UploadFile(String VMID, String filePathLocal, String filePathInGuest) {
         return null;
+    }
+
+    /**
+     * @功能描述 返回包含虚拟机信息的字符串，以json格式给出，包含内容有：虚拟机名称、是否是模板、电源状态、运行状态、磁盘大小（B）、内存大小（MB）、CPU数目、操作系统全名。
+     * 其中运行状态以四个颜色表示：gray（不可知）、green（虚拟机正常）、red（该虚拟机出现了问题）、yellow（虚拟机可能出现了问题）
+     * @return 虚拟机名称列表，以json的格式，包含虚拟机名称、是否是模板、电源状态、运行状态、磁盘大小（B）、内存大小（MB）、CPU数目、操作系统全名
+     */
+    @WebMethod
+    public String GetVMList() {
+        String retVal = "";
+        try {
+            retVal = VCGetVMList.run("Datacenter");
+        } catch (Throwable e) {
+            e.printStackTrace();
+            retVal = "error :" + e.getMessage();
+        } finally {
+            retVal = disconnect();
+        }
+        return retVal;
+    }
+
+    private String disconnect() {
+        String retVal = "";
+        try {
+            VCClientSession.Disconnect();
+            retVal = "success disconnect.";
+        } catch (Throwable e) {
+            e.printStackTrace();
+            retVal += "error :" + e.getMessage();
+        }
+        return  retVal;
     }
 }

@@ -10,12 +10,6 @@
       <root url="jar://$PROJECT_DIR$/lib/log4j-1.2.8.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/axis.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/vim25.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/samples-annotations-1.0.0.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/samples-core-1.0.0.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/sblim-cim-client2-2.1.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/ssoclient.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/ssosamples.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/wssamples.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
