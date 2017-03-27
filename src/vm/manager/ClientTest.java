@@ -21,7 +21,7 @@ public class ClientTest {
             // VCConfigVM.run("CloneTest", "update", "memory", "normal", "", "");
 
             // 获取虚拟机名称列表
-            String vmList = VCGetVMList.run("Datacenter");
+            String vmList = VCGetVMList.run("Datacenter", null);
             System.out.printf(vmList);
         } catch (Exception e) {
             e.printStackTrace();

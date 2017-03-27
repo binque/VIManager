@@ -17,7 +17,7 @@ public class VCCloneVM extends VCTaskBase {
      * @param cloneName      克隆出虚拟机的名称
      * @功能描述 从现有的虚拟机创建出一个模板，并且创建这个模板的多个克隆实例到目标datacenter中
      */
-    private static void CloneVM(String datacenterName, String vmPathName, String cloneName) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg, NoSuchMethodException, IllegalAccessException, InvocationTargetException, TaskInProgressFaultMsg, InvalidDatastoreFaultMsg, InsufficientResourcesFaultFaultMsg, FileFaultFaultMsg, VmConfigFaultFaultMsg, InvalidStateFaultMsg, MigrationFaultFaultMsg, CustomizationFaultFaultMsg, InvalidCollectorVersionFaultMsg {
+    private static void CloneVM(String datacenterName, String vmPathName, String cloneName, String adminID) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg, NoSuchMethodException, IllegalAccessException, InvocationTargetException, TaskInProgressFaultMsg, InvalidDatastoreFaultMsg, InsufficientResourcesFaultFaultMsg, FileFaultFaultMsg, VmConfigFaultFaultMsg, InvalidStateFaultMsg, MigrationFaultFaultMsg, CustomizationFaultFaultMsg, InvalidCollectorVersionFaultMsg, InvalidLoginFaultMsg, NoSuchAlgorithmException, InvalidLocaleFaultMsg, KeyManagementException {
         init();
 
         // 找到数据中心的对象引用
@@ -47,6 +47,16 @@ public class VCCloneVM extends VCTaskBase {
         cloneSpec.setPowerOn(false);
         // 标识克隆完成后不置成模板
         cloneSpec.setTemplate(false);
+        // 表示克隆机器的管理员ID
+        ManagedByInfo mbinfo = new ManagedByInfo();
+        if (adminID == null) {
+            mbinfo.setExtensionKey("default");
+            mbinfo.setType("NormalAdmin");
+        } else {
+            mbinfo.setExtensionKey(adminID);
+            mbinfo.setType("NormalAdmin");
+        }
+        cloneSpec.getConfig().setManagedBy(mbinfo);
 
         System.out.printf("Cloning Virtual Machine [%s] to clone name [%s] %n", vmPathName.substring(vmPathName.lastIndexOf("/") + 1), cloneName);
         ManagedObjectReference cloneTask = vimPort.cloneVMTask(vmRef, vmFolderRef, cloneName, cloneSpec);
@@ -57,11 +67,11 @@ public class VCCloneVM extends VCTaskBase {
         }
     }
 
-    public static void run(String datacenterName, String vmPathName, String cloneName) throws InvalidLoginFaultMsg, NoSuchAlgorithmException, RuntimeFaultFaultMsg, InvalidLocaleFaultMsg, KeyManagementException, InsufficientResourcesFaultFaultMsg, InvocationTargetException, NoSuchMethodException, TaskInProgressFaultMsg, InvalidStateFaultMsg, IllegalAccessException, CustomizationFaultFaultMsg, FileFaultFaultMsg, MigrationFaultFaultMsg, InvalidPropertyFaultMsg, InvalidDatastoreFaultMsg, VmConfigFaultFaultMsg, InvalidCollectorVersionFaultMsg {
+    public static void run(String datacenterName, String vmPathName, String cloneName, String adminID) throws InvalidLoginFaultMsg, NoSuchAlgorithmException, RuntimeFaultFaultMsg, InvalidLocaleFaultMsg, KeyManagementException, InsufficientResourcesFaultFaultMsg, InvocationTargetException, NoSuchMethodException, TaskInProgressFaultMsg, InvalidStateFaultMsg, IllegalAccessException, CustomizationFaultFaultMsg, FileFaultFaultMsg, MigrationFaultFaultMsg, InvalidPropertyFaultMsg, InvalidDatastoreFaultMsg, VmConfigFaultFaultMsg, InvalidCollectorVersionFaultMsg {
         if (!VCClientSession.IsConnected()) {
             VCClientSession.Connect();
         }
 
-        CloneVM(datacenterName, vmPathName, cloneName);
+        CloneVM(datacenterName, vmPathName, cloneName, adminID);
     }
 }

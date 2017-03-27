@@ -6,8 +6,9 @@ import java.util.*;
 
 /**
  * Created by huxia on 2017/3/15.
+ * Completed By Huxiao
  */
-public class VCHelper {
+class VCHelper {
     private static VimPortType vimPort;
     private static ServiceContent serviceContent;
 
@@ -25,7 +26,7 @@ public class VCHelper {
      * @return 过滤的结果
      * @功能描述 返回在属性列表中过滤的所提供容器的原始RetrieveResult对象
      */
-    public static RetrieveResult containerViewByType(
+    private static RetrieveResult containerViewByType(
             final ManagedObjectReference container,
             final String morefType,
             final RetrieveOptions retrieveOptions,
@@ -37,11 +38,11 @@ public class VCHelper {
         return containerViewByType(container, morefType, morefProperties, retrieveOptions, propertyFilterSpecs);
     }
 
-    public static PropertyFilterSpec[] propertyFilterSpecs(ManagedObjectReference container, String morefType, String[] morefProperties) throws RuntimeFaultFaultMsg {
+    private static PropertyFilterSpec[] propertyFilterSpecs(ManagedObjectReference container, String morefType, String[] morefProperties) throws RuntimeFaultFaultMsg {
         init();
 
         ManagedObjectReference viewManager = serviceContent.getViewManager();
-        ManagedObjectReference containerView = vimPort.createContainerView(viewManager, container, Arrays.asList(morefType), true);
+        ManagedObjectReference containerView = vimPort.createContainerView(viewManager, container, Collections.singletonList(morefType), true);
 
         return new PropertyFilterSpec[]{
                 new PropertyFilterSpecBuilder()
@@ -65,7 +66,7 @@ public class VCHelper {
         };
     }
 
-    public static RetrieveResult containerViewByType(
+    private static RetrieveResult containerViewByType(
             final ManagedObjectReference container,
             final String morType,
             final String[] morPropertie,
@@ -85,8 +86,8 @@ public class VCHelper {
      * @return 映射的MOREF和映射的名称值对的属性请求的托管对象存在。 如果不存在，则返回空映射
      * @功能描述 返回指定容器下面指定类型的所有MOREF
      */
-    public static Map<ManagedObjectReference, Map<String, Object>> inContainerByType(ManagedObjectReference container, String morefType,
-                                                                                     String[] morefProperties, RetrieveOptions retrieveOptions) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+    static Map<ManagedObjectReference, Map<String, Object>> inContainerByType(ManagedObjectReference container, String morefType,
+                                                                              String[] morefProperties, RetrieveOptions retrieveOptions) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
         List<ObjectContent> listcont = containerViewByType(container, morefType, retrieveOptions, morefProperties).getObjects();
 
         Map<ManagedObjectReference, Map<String, Object>> tgetMoref = new HashMap<>();
@@ -112,13 +113,13 @@ public class VCHelper {
      * @return 映射的MOREF和映射的名称值对的属性请求的托管对象存在。 如果不存在，则返回空映射
      * @功能描述 返回指定容器下面指定类型的所有MOREF
      */
-    public static Map<String, ManagedObjectReference> inContainerByType(ManagedObjectReference folder, String morefType, RetrieveOptions retrieveOptions) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+    private static Map<String, ManagedObjectReference> inContainerByType(ManagedObjectReference folder, String morefType, RetrieveOptions retrieveOptions) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
         init();
         RetrieveResult retrieveResult = containerViewByType(folder, morefType, retrieveOptions);
         return toMap(retrieveResult);
     }
 
-    public static RetrieveResult containerViewByType(
+    private static RetrieveResult containerViewByType(
             final ManagedObjectReference container,
             final String morefType,
             final RetrieveOptions retrieveOptions
@@ -128,7 +129,7 @@ public class VCHelper {
 
     private static Map<String, ManagedObjectReference> toMap(RetrieveResult retrieveResult) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
         final Map<String, ManagedObjectReference> tgetMoref = new HashMap<>();
-        String token = null;
+        String token;
 
         token = populate(retrieveResult, tgetMoref);
 
@@ -140,7 +141,7 @@ public class VCHelper {
         return tgetMoref;
     }
 
-    private static String populate(final RetrieveResult retrieveResult, final Map<String, ManagedObjectReference> tgetMoref) {
+    public static String populate(final RetrieveResult retrieveResult, final Map<String, ManagedObjectReference> tgetMoref) {
         String token = null;
         if (retrieveResult != null) {
             token = retrieveResult.getToken();
@@ -159,7 +160,7 @@ public class VCHelper {
         return token;
     }
 
-    public static String populate(final RetrieveResult rslts, final List<ObjectContent> listobjcontent) {
+    private static String populate(final RetrieveResult rslts, final List<ObjectContent> listobjcontent) {
         String token = null;
         if (rslts != null) {
             token = rslts.getToken();
@@ -168,23 +169,23 @@ public class VCHelper {
         return token;
     }
 
-    public static Map<String, ManagedObjectReference> inContainerByType(ManagedObjectReference container, String morefType) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+    static Map<String, ManagedObjectReference> inContainerByType(ManagedObjectReference container, String morefType) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
         return inContainerByType(container, morefType, new RetrieveOptions());
     }
 
     /**
-     * @功能描述 检索当前MOR的属性
      * @param entityMor 所要检索的实体的MOR
-     * @param props 检索的属性集合
+     * @param props     检索的属性集合
      * @return 返回属性名和其相应属性的Map
      * @throws InvalidPropertyFaultMsg 该属性不存在
+     * @功能描述 检索当前MOR的属性
      */
-    public static Map<String, Object> entityProps(ManagedObjectReference entityMor, String[] props)
+    static Map<String, Object> entityProps(ManagedObjectReference entityMor, String[] props)
             throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
 
         init();
 
-        final HashMap<String, Object> retVal = new HashMap<String, Object>();
+        final HashMap<String, Object> retVal = new HashMap<>();
 
         // Create PropertyFilterSpec using the PropertySpec and ObjectPec
         PropertyFilterSpec[] propertyFilterSpecs = {
@@ -218,16 +219,15 @@ public class VCHelper {
         return retVal;
     }
 
-    public static Map<ManagedObjectReference, Map<String, Object>> entityProps(
+    static Map<ManagedObjectReference, Map<String, Object>> entityProps(
             List<ManagedObjectReference> entityMors, String[] props)
             throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
         init();
 
-        Map<ManagedObjectReference, Map<String, Object>> retVal =
-                new HashMap<ManagedObjectReference, Map<String, Object>>();
+        Map<ManagedObjectReference, Map<String, Object>> retVal = new HashMap<>();
         // Create PropertyFilterSpec
         PropertyFilterSpecBuilder propertyFilterSpec = new PropertyFilterSpecBuilder();
-        Map<String, String> typesCovered = new HashMap<String, String>();
+        Map<String, String> typesCovered = new HashMap<>();
 
         for (ManagedObjectReference mor : entityMors) {
             if (!typesCovered.containsKey(mor.getType())) {
@@ -246,26 +246,26 @@ public class VCHelper {
             );
         }
         List<PropertyFilterSpec> propertyFilterSpecs =
-                new ArrayList<PropertyFilterSpec>();
+                new ArrayList<>();
         propertyFilterSpecs.add(propertyFilterSpec);
 
         RetrieveResult rslts =
                 vimPort.retrievePropertiesEx(serviceContent.getPropertyCollector(),
                         propertyFilterSpecs, new RetrieveOptions());
 
-        List<ObjectContent> listobjcontent = new ArrayList<ObjectContent>();
-        String token = populate(rslts,listobjcontent);
+        List<ObjectContent> listobjcontent = new ArrayList<>();
+        String token = populate(rslts, listobjcontent);
         while (token != null && !token.isEmpty()) {
             rslts =
                     vimPort.continueRetrievePropertiesEx(
                             serviceContent.getPropertyCollector(), token);
 
-            token = populate(rslts,listobjcontent);
+            token = populate(rslts, listobjcontent);
         }
 
         for (ObjectContent oc : listobjcontent) {
             List<DynamicProperty> dps = oc.getPropSet();
-            Map<String, Object> propMap = new HashMap<String, Object>();
+            Map<String, Object> propMap = new HashMap<>();
             if (dps != null) {
                 for (DynamicProperty dp : dps) {
                     propMap.put(dp.getName(), dp.getVal());
@@ -278,11 +278,11 @@ public class VCHelper {
 
     /**
      * @param vmname           虚拟机的名称
-     * @param propCollectorRef
+     * @param propCollectorRef prop collector reference
      * @return 该虚拟机的MOR
      * @功能描述 通过虚拟机的名称获得该虚拟机的MOR
      */
-    public static ManagedObjectReference vmByVmname(final String vmname, final ManagedObjectReference propCollectorRef) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+    static ManagedObjectReference vmByVmname(final String vmname, final ManagedObjectReference propCollectorRef) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
         init();
 
         ManagedObjectReference retVal = null;
@@ -307,7 +307,7 @@ public class VCHelper {
                 .objectSet(objectSpec);
 
         List<PropertyFilterSpec> listpfs =
-                new ArrayList<PropertyFilterSpec>(1);
+                new ArrayList<>(1);
         listpfs.add(propertyFilterSpec);
 
         RetrieveOptions options = new RetrieveOptions();
@@ -387,10 +387,10 @@ public class VCHelper {
     public static class PropertyFilterSpecBuilder extends PropertyFilterSpec {
         private void init() {
             if (propSet == null) {
-                propSet = new ArrayList<PropertySpec>();
+                propSet = new ArrayList<>();
             }
             if (objectSet == null) {
-                objectSet = new ArrayList<ObjectSpec>();
+                objectSet = new ArrayList<>();
             }
         }
 
@@ -399,13 +399,13 @@ public class VCHelper {
             return this;
         }
 
-        public PropertyFilterSpecBuilder propSet(final PropertySpec... propertySpecs) {
+        PropertyFilterSpecBuilder propSet(final PropertySpec... propertySpecs) {
             init();
             this.propSet.addAll(Arrays.asList(propertySpecs));
             return this;
         }
 
-        public PropertyFilterSpecBuilder objectSet(final ObjectSpec... objectSpecs) {
+        PropertyFilterSpecBuilder objectSet(final ObjectSpec... objectSpecs) {
             init();
             this.objectSet.addAll(Arrays.asList(objectSpecs));
             return this;
@@ -415,21 +415,21 @@ public class VCHelper {
     public static class PropertySpecBuilder extends PropertySpec {
         private void init() {
             if (pathSet == null) {
-                pathSet = new ArrayList<String>();
+                pathSet = new ArrayList<>();
             }
         }
 
-        public PropertySpecBuilder all(final Boolean all) {
+        PropertySpecBuilder all(final Boolean all) {
             this.setAll(all);
             return this;
         }
 
-        public PropertySpecBuilder type(final String type) {
+        PropertySpecBuilder type(final String type) {
             this.setType(type);
             return this;
         }
 
-        public PropertySpecBuilder pathSet(final String... paths) {
+        PropertySpecBuilder pathSet(final String... paths) {
             init();
             this.pathSet.addAll(Arrays.asList(paths));
             return this;
@@ -442,66 +442,66 @@ public class VCHelper {
         }
     }
 
-    public static class ObjectSpecBuilder extends ObjectSpec {
+    static class ObjectSpecBuilder extends ObjectSpec {
         private void init() {
             if (selectSet == null) {
-                selectSet = new ArrayList<SelectionSpec>();
+                selectSet = new ArrayList<>();
             }
         }
 
-        public ObjectSpecBuilder obj(final ManagedObjectReference objectReference) {
+        ObjectSpecBuilder obj(final ManagedObjectReference objectReference) {
             this.setObj(objectReference);
             return this;
         }
 
-        public ObjectSpecBuilder skip(final Boolean skip) {
+        ObjectSpecBuilder skip(final Boolean skip) {
             this.setSkip(skip);
             return this;
         }
 
-        public ObjectSpecBuilder selectSet(final SelectionSpec... selectionSpecs) {
+        ObjectSpecBuilder selectSet(final SelectionSpec... selectionSpecs) {
             init();
             this.selectSet.addAll(Arrays.asList(selectionSpecs));
             return this;
         }
     }
 
-    public static class TraversalSpecBuilder extends TraversalSpec {
+    static class TraversalSpecBuilder extends TraversalSpec {
         private void init() {
             if (selectSet == null) {
-                selectSet = new ArrayList<SelectionSpec>();
+                selectSet = new ArrayList<>();
             }
         }
 
-        public TraversalSpecBuilder name(final String name) {
+        TraversalSpecBuilder name(final String name) {
             this.setName(name);
             return this;
         }
 
-        public TraversalSpecBuilder path(final String path) {
+        TraversalSpecBuilder path(final String path) {
             this.setPath(path);
             return this;
         }
 
-        public TraversalSpecBuilder skip(final Boolean skip) {
+        TraversalSpecBuilder skip(final Boolean skip) {
             this.setSkip(skip);
             return this;
         }
 
-        public TraversalSpecBuilder type(final String type) {
+        TraversalSpecBuilder type(final String type) {
             this.setType(type);
             return this;
         }
 
-        public TraversalSpecBuilder selectSet(final SelectionSpec... selectionSpecs) {
+        TraversalSpecBuilder selectSet(final SelectionSpec... selectionSpecs) {
             init();
             this.selectSet.addAll(Arrays.asList(selectionSpecs));
             return this;
         }
     }
 
-    public static class SelectionSpecBuilder extends SelectionSpec {
-        public SelectionSpecBuilder name(final String name) {
+    static class SelectionSpecBuilder extends SelectionSpec {
+        SelectionSpecBuilder name(final String name) {
             this.setName(name);
             return this;
         }

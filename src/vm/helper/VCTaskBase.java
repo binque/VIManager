@@ -4,6 +4,8 @@ import com.vmware.vim25.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +17,10 @@ public class VCTaskBase {
     protected static VimPortType vimPort;
     protected static ServiceContent serviceContent;
 
-    protected static void init() {
+    protected static void init() throws InvalidLoginFaultMsg, NoSuchAlgorithmException, RuntimeFaultFaultMsg, InvalidLocaleFaultMsg, KeyManagementException {
+        if (!VCClientSession.IsConnected()) {
+            VCClientSession.Connect();
+        }
         vimPort = VCClientSession.getVimPort();
         serviceContent = VCClientSession.getServiceContent();
     }
@@ -41,7 +46,7 @@ public class VCTaskBase {
         return retValue;
     }
 
-    protected static Object getDynamicProperty(ManagedObjectReference mor, String propertyName) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    protected static Object getDynamicProperty(ManagedObjectReference mor, String propertyName) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InvalidLoginFaultMsg, NoSuchAlgorithmException, InvalidLocaleFaultMsg, KeyManagementException {
         ObjectContent[] objContent = getObjectProperties(mor, new String[]{propertyName});
 
         Object propertyValue = null;
@@ -87,7 +92,7 @@ public class VCTaskBase {
      * @return 检索到的对象内容
      * @功能描述 在向服务注册的属性收集器检索中单个对象的内容
      */
-    private static ObjectContent[] getObjectProperties(ManagedObjectReference mor, String[] properties) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+    private static ObjectContent[] getObjectProperties(ManagedObjectReference mor, String[] properties) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg, InvalidLoginFaultMsg, NoSuchAlgorithmException, InvalidLocaleFaultMsg, KeyManagementException {
         if (mor == null) {
             return null;
         }
@@ -116,7 +121,7 @@ public class VCTaskBase {
      * @return 对象内容列表
      * @功能描述 使用新的RetrievePropertiesEx方法来模拟现在已弃用的RetrieveProperties方法
      */
-    private static List<ObjectContent> retrievePropertiesAllObjects(List<PropertyFilterSpec> listpfs) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+    private static List<ObjectContent> retrievePropertiesAllObjects(List<PropertyFilterSpec> listpfs) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg, InvalidLoginFaultMsg, NoSuchAlgorithmException, InvalidLocaleFaultMsg, KeyManagementException {
         init();
 
         RetrieveOptions propObjectRetrieveOpts = new RetrieveOptions();

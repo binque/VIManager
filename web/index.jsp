@@ -8,9 +8,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
   <head>
-    <title>$Title$</title>
+    <title>Virtual Resource Management</title>
   </head>
   <body>
-  $END$
+  <div>
+    <p>Copyright 2017 by BUAA Collage of Software Engineering</p>
+    <p>All Rights Reserved</p>
+  </div>
   </body>
 </html>

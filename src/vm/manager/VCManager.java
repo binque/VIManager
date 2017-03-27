@@ -106,11 +106,11 @@ public class VCManager {
      * @功能描述 从模板创建一个虚拟机
      */
     @WebMethod
-    public String CreateFromTemplate(String templateID, String VMID) {
+    public String CreateFromTemplate(String templateID, String VMID, String adminID) {
         String retVal = "";
         if (templateID != null && !templateID.isEmpty() && VMID != null && !VMID.isEmpty()) {
             try {
-                VCCloneVM.run("Datacenter", "Datacenter/vm/" + templateID, VMID);
+                VCCloneVM.run("Datacenter", "Datacenter/vm/" + templateID, VMID, adminID);
                 retVal = "success finished.";
             } catch (Throwable e) {
                 e.printStackTrace();
@@ -197,15 +197,18 @@ public class VCManager {
      * @return 虚拟机名称列表，以json的格式，包含虚拟机名称、是否是模板、电源状态、运行状态、磁盘大小（B）、内存大小（MB）、CPU数目、操作系统全名
      */
     @WebMethod
-    public String GetVMList() {
+    public String GetVMList(String adminID) {
         String retVal = "";
         try {
-            retVal = VCGetVMList.run("Datacenter");
+            retVal = VCGetVMList.run("Datacenter", adminID);
         } catch (Throwable e) {
             e.printStackTrace();
             retVal = "error :" + e.getMessage();
         } finally {
-            retVal = disconnect();
+            String temp = disconnect();
+            if (temp.startsWith("error")) {
+                retVal += temp;
+            }
         }
         return retVal;
     }

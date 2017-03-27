@@ -35,20 +35,20 @@ public class VCClientSession {
 
     private static VimPortType vimPort;
 
-    public static VimPortType getVimPort() {
+    static VimPortType getVimPort() {
         return vimPort;
     }
 
     private static ServiceContent serviceContent;
 
-    public static ServiceContent getServiceContent() {
+    static ServiceContent getServiceContent() {
         return serviceContent;
     }
 
     private static final String SVC_INST_NAME = "ServiceInstance";
     private static boolean isConnected = false;
 
-    public static boolean IsConnected() {
+    static boolean IsConnected() {
         return isConnected;
     }
 
@@ -152,7 +152,7 @@ public class VCClientSession {
         }
     }
 
-    public static Object[] WaitForValues(ManagedObjectReference objmor, String[] filterProps, String[] endWaitProps, Object[][] expectedVals) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg, InvalidCollectorVersionFaultMsg {
+    static Object[] WaitForValues(ManagedObjectReference objmor, String[] filterProps, String[] endWaitProps, Object[][] expectedVals) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg, InvalidCollectorVersionFaultMsg {
         ManagedObjectReference filterSpecRef = null;
 
         // version string is initially null
