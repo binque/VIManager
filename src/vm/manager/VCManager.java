@@ -47,46 +47,55 @@ public class VCManager {
     /*
      * @param name 主机名字如10.251.0.16
      */
-    public String getHostInfo(String name){
-    	VCHostInfo hsInfo = new VCHostInfo();
-    	hsInfo.setHostName(name);
-    	String info = null;
-    	try {
-			info =  hsInfo.run();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return "error :" + e.getMessage();
-		}
-    	return info;
+    public String GetHostInfo(String name) {
+        VCHostInfo.setHostName(name);
+        String info = "";
+        try {
+            info = VCHostInfo.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+            info = "error :" + e.getMessage();
+        } finally {
+            String temp = disconnect();
+            if (temp.startsWith("error")) {
+                info += temp;
+            }
+        }
+        return info;
     }
     
     @WebMethod
-    public String getLicenseInfo(){
-    	VCLicensesInfo ls = new VCLicensesInfo();
-    	String info;
-    	try {
-			info = ls.run();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return "error :" + e.getMessage();
-		}
-    	return info;
+    public String GetLicenseInfo() {
+        String info = "";
+        try {
+            info = VCLicensesInfo.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+            info = "error :" + e.getMessage();
+        } finally {
+            String temp = disconnect();
+            if (temp.startsWith("error")) {
+                info += temp;
+            }
+        }
+        return info;
     }
     
     @WebMethod
-    public String getStorageInfo(){
-    	VCStorageInfo stInfo = new VCStorageInfo();
-    	String info;
-    	try {
-			info = stInfo.run();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return "error :" + e.getMessage();
-		}
-    	return info;
+    public String GetStorageInfo() {
+        String info = "";
+        try {
+            info = VCStorageInfo.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+            info = "error :" + e.getMessage();
+        } finally {
+            String temp = disconnect();
+            if (temp.startsWith("error")) {
+                info += temp;
+            }
+        }
+        return info;
     }
     
     /**

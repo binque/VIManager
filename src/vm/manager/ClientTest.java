@@ -1,7 +1,6 @@
 package vm.manager;
 
-import vm.helper.VCClientSession;
-import vm.helper.VCGetVMList;
+import vm.helper.*;
 
 /*
  * Created by huxia on 2017/3/13.
@@ -22,7 +21,20 @@ public class ClientTest {
 
             // 获取虚拟机名称列表
             String vmList = VCGetVMList.run("Datacenter", null);
-            System.out.printf(vmList);
+            System.out.println(vmList);
+
+            // 获取主机信息
+            VCHostInfo.setHostName("10.251.0.16");
+            String hostInfo = VCHostInfo.run();
+            System.out.println(hostInfo);
+
+            // 获取许可证信息
+            String licenseInfo = VCLicensesInfo.run();
+            System.out.println(licenseInfo);
+
+            // 获取存储信息
+            String storageInfo = VCStorageInfo.run();
+            System.out.println(storageInfo);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
