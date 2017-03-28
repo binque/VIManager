@@ -42,7 +42,53 @@ public class VCManager {
         }
         return retVal;
     }
-
+    
+    @WebMethod
+    /*
+     * @param name 主机名字如10.251.0.16
+     */
+    public String getHostInfo(String name){
+    	VCHostInfo hsInfo = new VCHostInfo();
+    	hsInfo.setHostName(name);
+    	String info = null;
+    	try {
+			info =  hsInfo.run();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "error :" + e.getMessage();
+		}
+    	return info;
+    }
+    
+    @WebMethod
+    public String getLicenseInfo(){
+    	VCLicensesInfo ls = new VCLicensesInfo();
+    	String info;
+    	try {
+			info = ls.run();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "error :" + e.getMessage();
+		}
+    	return info;
+    }
+    
+    @WebMethod
+    public String getStorageInfo(){
+    	VCStorageInfo stInfo = new VCStorageInfo();
+    	String info;
+    	try {
+			info = stInfo.run();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "error :" + e.getMessage();
+		}
+    	return info;
+    }
+    
     /**
      * @param VMID 虚拟机的名字
      * @param Op   操作的名字，可以使poweron、shutdown、reboot等
