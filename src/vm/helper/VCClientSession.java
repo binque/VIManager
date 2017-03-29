@@ -129,8 +129,8 @@ public class VCClientSession {
         perfManager = serviceContent.getPerfManager();
         propCollectorRef = serviceContent.getPropertyCollector();
 
-        logger.debug(serviceContent.getAbout().getFullName());
-        logger.debug("Server type is " + serviceContent.getAbout().getApiType());
+        logger.info(serviceContent.getAbout().getFullName());
+        logger.info("Server type is " + serviceContent.getAbout().getApiType());
     }
 
     /**
@@ -211,7 +211,7 @@ public class VCClientSession {
                     if (endVals[chgi] == null) {
                         // Do Nothing
                     } else if (endVals[chgi].toString().contains("val: null")) {
-                        // Due to some issue in JAX-WS De-serialization getting the information from
+                        // Due to some issue in JAX-WS De-serialization getting the infomation from
                         // the nodes
                         Element stateElement = (Element) endVals[chgi];
                         if (stateElement != null && stateElement.getFirstChild() != null) {

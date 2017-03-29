@@ -15,7 +15,8 @@ import static vm.helper.VCClientSession.Disconnect;
  */
 @WebService
 public class VCManager {
-    /**     * @param vmName     虚拟机的名字
+    /**
+     * @param vmName   虚拟机的名字
      * @param CPU      给虚拟机分配的cpu核心数目
      * @param memory   给虚拟机分配的内存大小
      * @param Disk     给虚拟机分配的磁盘空间大小
@@ -36,70 +37,53 @@ public class VCManager {
             }
         } catch (Throwable e) {
             e.printStackTrace();
-            retVal =  "error :" + e.getMessage();
-        } finally {
-            retVal += disconnect();
+            retVal = "error :" + e.getMessage();
         }
         return retVal;
     }
-    
+
     @WebMethod
     /*
      * @param name 主机名字如10.251.0.16
      */
     public String GetHostInfo() {
-        String info = "";
+        String info;
         try {
             info = VCHostInfo.run();
         } catch (Exception e) {
             e.printStackTrace();
             info = "error :" + e.getMessage();
-        } finally {
-            String temp = disconnect();
-            if (temp.startsWith("error")) {
-                info += temp;
-            }
         }
         return info;
     }
-    
+
     @WebMethod
     public String GetLicenseInfo() {
-        String info = "";
+        String info;
         try {
             info = VCLicensesInfo.run();
         } catch (Exception e) {
             e.printStackTrace();
             info = "error :" + e.getMessage();
-        } finally {
-            String temp = disconnect();
-            if (temp.startsWith("error")) {
-                info += temp;
-            }
         }
         return info;
     }
-    
+
     @WebMethod
     public String GetStorageInfo() {
-        String info = "";
+        String info;
         try {
             info = VCStorageInfo.run();
         } catch (Exception e) {
             e.printStackTrace();
             info = "error :" + e.getMessage();
-        } finally {
-            String temp = disconnect();
-            if (temp.startsWith("error")) {
-                info += temp;
-            }
         }
         return info;
     }
-    
+
     /**
      * @param vmName 虚拟机的名字
-     * @param Op   操作的名字，可以使poweron、shutdown、reboot等
+     * @param Op     操作的名字，可以使poweron、shutdown、reboot等
      * @return 如果成功则返回null，否则返回表示错误信息的字符串
      * @功能描述 对虚拟机进行的基本操作
      */
@@ -144,8 +128,6 @@ public class VCManager {
             } catch (Throwable e) {
                 e.printStackTrace();
                 retVal += "error :" + e.getMessage();
-            }finally {
-                retVal += disconnect();
             }
         } else {
             retVal = "error :parameter cannot be null.";
@@ -155,13 +137,13 @@ public class VCManager {
 
     /**
      * @param templateID 模板名称
-     * @param vmName       虚拟机名称
+     * @param vmName     虚拟机名称
      * @return 如果任务执行完成（不意味着虚拟机创建完成），返回以success开始的字符串；否则返回以error开始，表示错误信息的字符串
      * @功能描述 从模板创建一个虚拟机
      */
     @WebMethod
     public String CreateFromTemplate(String templateID, String vmName, String adminID) {
-        String retVal = "";
+        String retVal;
         if (templateID != null && !templateID.isEmpty() && vmName != null && !vmName.isEmpty()) {
             try {
                 VCCloneVM.run("Datacenter", "Datacenter/vm/" + templateID, vmName, adminID);
@@ -169,8 +151,6 @@ public class VCManager {
             } catch (Throwable e) {
                 e.printStackTrace();
                 retVal = "error :" + e.getMessage();
-            } finally {
-                retVal += disconnect();
             }
         } else {
             retVal = "error :parameter cannot be null.";
@@ -179,7 +159,7 @@ public class VCManager {
     }
 
     /**
-     * @param vmName      虚拟机名称
+     * @param vmName    虚拟机名称
      * @param targetDir 目标目录
      * @return 如果成功则返回null，否则返回表示错误信息的字符串
      * @功能描述 到处虚拟机到目标目录
@@ -200,7 +180,7 @@ public class VCManager {
     }
 
     /**
-     * @param vmName     虚拟机名称
+     * @param vmName   虚拟机名称
      * @param PerfUnit perf
      * @return 如果成功则返回null，否则返回表示错误信息的字符串
      */
@@ -210,7 +190,7 @@ public class VCManager {
     }
 
     /**
-     * @param vmName         虚拟机名称
+     * @param vmName       虚拟机名称
      * @param op           操作
      * @param snapshotname 快照名称
      * @return 如果成功则返回null，否则返回表示错误信息的字符串
@@ -222,7 +202,7 @@ public class VCManager {
     }
 
     /**
-     * @param vmName    虚拟机名称
+     * @param vmName  虚拟机名称
      * @param fileDir 例程路径
      * @param args    执行参数
      * @return 如果成功则返回null，否则返回表示错误信息的字符串
@@ -234,7 +214,7 @@ public class VCManager {
     }
 
     /**
-     * @param vmName           虚拟机名称
+     * @param vmName          虚拟机名称
      * @param filePathLocal   源位置（本机路径）
      * @param filePathInGuest 目标位置（客户集中的路径）
      * @return 如果成功则返回null，否则返回表示错误信息的字符串
@@ -246,36 +226,19 @@ public class VCManager {
     }
 
     /**
+     * @return 虚拟机名称列表，以json的格式，包含虚拟机名称、是否是模板、电源状态、运行状态、磁盘大小（B）、内存大小（MB）、CPU数目、操作系统全名
      * @功能描述 返回包含虚拟机信息的字符串，以json格式给出，包含内容有：虚拟机名称、是否是模板、电源状态、运行状态、磁盘大小（B）、内存大小（MB）、CPU数目、操作系统全名。
      * 其中运行状态以四个颜色表示：gray（不可知）、green（虚拟机正常）、red（该虚拟机出现了问题）、yellow（虚拟机可能出现了问题）
-     * @return 虚拟机名称列表，以json的格式，包含虚拟机名称、是否是模板、电源状态、运行状态、磁盘大小（B）、内存大小（MB）、CPU数目、操作系统全名
      */
     @WebMethod
     public String GetVMList(String adminID) {
-        String retVal = "";
+        String retVal;
         try {
             retVal = VCGetVMList.run("Datacenter", adminID);
         } catch (Throwable e) {
             e.printStackTrace();
             retVal = "error :" + e.getMessage();
-        } finally {
-            String temp = disconnect();
-            if (temp.startsWith("error")) {
-                retVal += temp;
-            }
         }
         return retVal;
-    }
-
-    private String disconnect() {
-        String retVal = "";
-        try {
-            VCClientSession.Disconnect();
-            retVal = "success disconnect.";
-        } catch (Throwable e) {
-            e.printStackTrace();
-            retVal += "error :" + e.getMessage();
-        }
-        return  retVal;
     }
 }

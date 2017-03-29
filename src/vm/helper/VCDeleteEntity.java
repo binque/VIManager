@@ -19,11 +19,11 @@ public class VCDeleteEntity extends VCTaskBase {
 
         ManagedObjectReference moref = VCHelper.vmByVmname(entityName, serviceContent.getPropertyCollector());
         if (moref == null) {
-            logger.info(String.format("Managed entity cannot be found by name [ %s ]", entityName));
+            logger.error(String.format("Managed entity cannot be found by name [ %s ]", entityName));
         } else {
             ManagedObjectReference taskmor = vimPort.destroyTask(moref);
             if (getTaskResultAfterDone(taskmor)) {
-                logger.debug(String.format("Successful delete of Managed Entity Name - [ %s ]"
+                logger.info(String.format("Successful delete of Managed Entity Name - [ %s ]"
                         + " and Entity Type - [ %s ]%n", entityName, moref.getType()));
             }
         }

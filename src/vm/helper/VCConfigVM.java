@@ -30,7 +30,7 @@ public class VCConfigVM extends VCTaskBase {
             if (virtualmachien != null) {
                 reConfig(virtualmachien, vmName, operation, device, value, diskSize, diskmode);
             } else {
-                logger.info(String.format("Virtual Machine named [ %s ] not found.", vmName));
+                logger.error(String.format("Virtual Machine named [ %s ] not found.", vmName));
             }
         }
     }
@@ -48,23 +48,23 @@ public class VCConfigVM extends VCTaskBase {
         VirtualMachineConfigSpec virtualMachineConfigSpec = new VirtualMachineConfigSpec();
 
         if (deviceType.equalsIgnoreCase("memory") && operation.equalsIgnoreCase("update")) {
-            logger.debug(String.format("Reconfiguring The Virtual Machine [ %s ] For Memory Update", vmName));
+            logger.info(String.format("Reconfiguring The Virtual Machine [ %s ] For Memory Update", vmName));
             try {
                 virtualMachineConfigSpec.setMemoryAllocation(getShares(value));
             } catch (NumberFormatException e) {
-                logger.info("Value of Memory update must be one of high|low|normal|[numeric value]");
+                logger.error("Value of Memory update must be one of high|low|normal|[numeric value]");
                 return;
             }
         } else if (deviceType.equalsIgnoreCase("cpu") && !operation.equalsIgnoreCase("update")) {
-            logger.debug(String.format("Reconfiguring The Virtual Machine [ %s ] For CPU Update", vmName));
+            logger.info(String.format("Reconfiguring The Virtual Machine [ %s ] For CPU Update", vmName));
             try {
                 virtualMachineConfigSpec.setCpuAllocation(getShares(value));
             } catch (NumberFormatException e) {
-                logger.info("Value of CPU update must be one of high|low|normal|[numeric value]");
+                logger.error("Value of CPU update must be one of high|low|normal|[numeric value]");
                 return;
             }
         } else if (deviceType.equalsIgnoreCase("disk") && !operation.equalsIgnoreCase("update")) {
-            logger.debug(String.format("Reconfiguring The Virtual Machine [ %s ] For Disk Update", vmName));
+            logger.info(String.format("Reconfiguring The Virtual Machine [ %s ] For Disk Update", vmName));
             VirtualDeviceConfigSpec virtualDeviceConfigSpec = getDiskDeviceConfigSpec(virtualMachine, vmName, operation, value, diskSize, diskmode);
             if (virtualDeviceConfigSpec != null) {
                 virtualMachineConfigSpec.getDeviceChange().add(virtualDeviceConfigSpec);
@@ -72,7 +72,7 @@ public class VCConfigVM extends VCTaskBase {
                 return;
             }
         } else if (deviceType.equalsIgnoreCase("nic") && !operation.equalsIgnoreCase("update")) {
-            logger.debug(String.format("Reconfiguring The Virtual Machine [ %s ] For NIC Update", vmName));
+            logger.info(String.format("Reconfiguring The Virtual Machine [ %s ] For NIC Update", vmName));
             VirtualDeviceConfigSpec virtualDeviceConfigSpec = getNICDeviceConfigSpec(virtualMachine, operation, value);
             if (virtualDeviceConfigSpec != null) {
                 virtualMachineConfigSpec.getDeviceChange().add(virtualDeviceConfigSpec);
@@ -80,7 +80,7 @@ public class VCConfigVM extends VCTaskBase {
                 return;
             }
         } else if (deviceType.equalsIgnoreCase("cd") && !operation.equalsIgnoreCase("update")) {
-            logger.debug(String.format("Reconfiguring The Virtual Machine [ %s ] For CD Update", vmName));
+            logger.info(String.format("Reconfiguring The Virtual Machine [ %s ] For CD Update", vmName));
             VirtualDeviceConfigSpec virtualDeviceConfigSpec = getCDDeviceConfigSpec(virtualMachine, operation, value);
             if (virtualDeviceConfigSpec != null) {
                 virtualMachineConfigSpec.getDeviceChange().add(virtualDeviceConfigSpec);
@@ -88,15 +88,15 @@ public class VCConfigVM extends VCTaskBase {
                 return;
             }
         } else {
-            logger.info("Invalid device type [ memory | cpu | disk | nic | cd ]");
+            logger.error("Invalid device type [ memory | cpu | disk | nic | cd ]");
             return;
         }
 
         ManagedObjectReference tmor = vimPort.reconfigVMTask(virtualMachine, virtualMachineConfigSpec);
         if (getTaskResultAfterDone(tmor)) {
-            logger.debug("Virtual Machine reconfigured successfully");
+            logger.info("Virtual Machine reconfigured successfully");
         } else {
-            logger.info("Virtual Machine reconfigur failed");
+            logger.error("Virtual Machine reconfigur failed");
         }
     }
 
@@ -237,7 +237,7 @@ public class VCConfigVM extends VCTaskBase {
                 diskSpec.setFileOperation(VirtualDeviceConfigSpecFileOperation.DESTROY);
                 diskSpec.setDevice(disk);
             } else {
-                logger.info("No device found " + value);
+                logger.error("No device found " + value);
                 return null;
             }
         }
@@ -315,7 +315,7 @@ public class VCConfigVM extends VCTaskBase {
             if (cdRemove != null) {
                 cdSpec.setDevice(cdRemove);
             } else {
-                logger.info("No device available " + value);
+                logger.error("No device available " + value);
                 return null;
             }
         }
@@ -349,7 +349,7 @@ public class VCConfigVM extends VCTaskBase {
             if (nic != null) {
                 nicSpec.setDevice(nic);
             } else {
-                logger.info("No device available " + value);
+                logger.error("No device available " + value);
                 return null;
             }
         }
@@ -371,29 +371,29 @@ public class VCConfigVM extends VCTaskBase {
         if (device.equalsIgnoreCase("disk")) {
             if (operation.equalsIgnoreCase("add")) {
                 if ((disksize == null) || (diskmode == null)) {
-                    logger.info("For add disk operation, disksize and diskmode are the Mandatory options");
+                    logger.error("For add disk operation, disksize and diskmode are the Mandatory options");
                     flag = false;
                 }
                 if (disksize != null && Integer.parseInt(disksize) <= 0) {
-                    logger.info("Disksize must be a greater than zero");
+                    logger.error("Disksize must be a greater than zero");
                     flag = false;
                 }
             }
             if (operation.equalsIgnoreCase("remove")) {
                 if (value == null) {
-                    logger.info("Please specify a label in value field to remove the disk");
+                    logger.error("Please specify a label in value field to remove the disk");
                 }
             }
         }
         if (device.equalsIgnoreCase("nic")) {
             if (operation == null) {
-                logger.info("For add nic operation is the Mandatory option");
+                logger.error("For add nic operation is the Mandatory option");
                 flag = false;
             }
         }
         if (device.equalsIgnoreCase("cd")) {
             if (operation == null) {
-                logger.info("For add cd operation is the Mandatory options");
+                logger.error("For add cd operation is the Mandatory options");
                 flag = false;
             }
         }
@@ -403,12 +403,12 @@ public class VCConfigVM extends VCTaskBase {
                     || operation.equalsIgnoreCase("update")) {
                 if (device.equals("cpu") || device.equals("memory")) {
                     if (!operation.equals("update")) {
-                        logger.info("Invalid operation specified for device cpu or memory");
+                        logger.error("Invalid operation specified for device cpu or memory");
                         flag = false;
                     }
                 }
             } else {
-                logger.info("Operation must be either add, remove or update");
+                logger.error("Operation must be either add, remove or update");
                 flag = false;
             }
         }

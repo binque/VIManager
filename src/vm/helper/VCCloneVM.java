@@ -23,19 +23,19 @@ public class VCCloneVM extends VCTaskBase {
         // 找到数据中心的对象引用
         ManagedObjectReference datacenterRef = vimPort.findByInventoryPath(serviceContent.getSearchIndex(), datacenterName);
         if (datacenterRef == null) {
-            logger.info(String.format("The specified datacenter [ %s ]is not found %n", datacenterName));
+            logger.error(String.format("The specified datacenter [ %s ]is not found %n", datacenterName));
             return;
         }
 
         // 找到这个虚拟机的目录
         ManagedObjectReference vmFolderRef = (ManagedObjectReference) getDynamicProperty(datacenterRef, "vmFolder");
         if (vmFolderRef == null) {
-            logger.info("The virtual machine is not found");
+            logger.error("The virtual machine is not found");
             return;
         }
         ManagedObjectReference vmRef = vimPort.findByInventoryPath(serviceContent.getSearchIndex(), vmPathName);
         if (vmRef == null) {
-            logger.info(String.format("The VMPath specified [ %s ] is not found %n", vmPathName));
+            logger.error(String.format("The VMPath specified [ %s ] is not found %n", vmPathName));
             return;
         }
 
@@ -48,22 +48,20 @@ public class VCCloneVM extends VCTaskBase {
         // 标识克隆完成后不置成模板
         cloneSpec.setTemplate(false);
         // 表示克隆机器的管理员ID
-        ManagedByInfo mbinfo = new ManagedByInfo();
+        VirtualMachineConfigSpec configSpec = new VirtualMachineConfigSpec();
         if (adminID == null) {
-            mbinfo.setExtensionKey("default");
-            mbinfo.setType("NormalAdmin");
+            configSpec.setAnnotation("default");
         } else {
-            mbinfo.setExtensionKey(adminID);
-            mbinfo.setType("NormalAdmin");
+            configSpec.setAnnotation(adminID);
         }
-        cloneSpec.getConfig().setManagedBy(mbinfo);
+        cloneSpec.setConfig(configSpec);
 
-        logger.debug(String.format("Cloning Virtual Machine [%s] to clone name [%s] %n", vmPathName.substring(vmPathName.lastIndexOf("/") + 1), cloneName));
+        logger.info(String.format("Cloning Virtual Machine [%s] to clone name [%s] %n", vmPathName.substring(vmPathName.lastIndexOf("/") + 1), cloneName));
         ManagedObjectReference cloneTask = vimPort.cloneVMTask(vmRef, vmFolderRef, cloneName, cloneSpec);
         if (getTaskResultAfterDone(cloneTask)) {
-            logger.debug(String.format("Successfully cloned Virtual Machine [%s] to clone name [%s] %n", vmPathName.substring(vmPathName.lastIndexOf("/") + 1), cloneName));
+            logger.info(String.format("Successfully cloned Virtual Machine [%s] to clone name [%s] %n", vmPathName.substring(vmPathName.lastIndexOf("/") + 1), cloneName));
         } else {
-            logger.info(String.format("Failure Cloning Virtual Machine [%s] to clone name [%s] %n", vmPathName.substring(vmPathName.lastIndexOf("/") + 1), cloneName));
+            logger.error(String.format("Failure Cloning Virtual Machine [%s] to clone name [%s] %n", vmPathName.substring(vmPathName.lastIndexOf("/") + 1), cloneName));
         }
     }
 

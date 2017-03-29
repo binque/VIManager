@@ -37,7 +37,7 @@ public class VCLicensesInfo extends VCTaskBase {
                             jo.put("Key of the License", assignedLicense.getLicenseKey());
                             jo.put("Date of the expiration", propertyOfDay.getValue().toString());
                             JsonInfo.add(jo);
-                            //logger.debug(assignedLicense.getName()+" "+assignedLicense.getLicenseKey()+" "+assignedLicense.getEditionKey()+" "+propertyOfDay.getKey()+" "+propertyOfDay.getValue());
+                            //logger.info(assignedLicense.getName()+" "+assignedLicense.getLicenseKey()+" "+assignedLicense.getEditionKey()+" "+propertyOfDay.getKey()+" "+propertyOfDay.getValue());
                         }
                     }
                 }

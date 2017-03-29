@@ -26,8 +26,8 @@ public class VCStorageInfo extends VCTaskBase {
 			jo.put("Total capability By B", capability);
 			jo.put("Free space By B", freeSpace);
 			JsonStorage.add(jo);
-			//logger.debug(" Name "+datastoreSummary.getName());
-			//logger.debug(datastoreSummary.getDatastore().getType()+" "+datastoreSummary.getDatastore().getValue()+" "+datastoreSummary.getUncommitted()+" "+datastoreSummary.getUrl());
+			//logger.info(" Name "+datastoreSummary.getName());
+			//logger.info(datastoreSummary.getDatastore().getType()+" "+datastoreSummary.getDatastore().getValue()+" "+datastoreSummary.getUncommitted()+" "+datastoreSummary.getUrl());
 
 		}
 		return JsonStorage.toString();

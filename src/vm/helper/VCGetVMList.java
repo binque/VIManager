@@ -29,7 +29,7 @@ public class VCGetVMList extends VCTaskBase {
 
         for (Map<String, Object> val : vmList.values()) {
             VirtualMachineSummary virtualMachineSummary = (VirtualMachineSummary) (val.get(props[0]));
-            if (adminID == null || virtualMachineSummary.getConfig().getManagedBy().getExtensionKey().equalsIgnoreCase(adminID)) {
+            if (adminID == null || virtualMachineSummary.getConfig().getAnnotation().equals(adminID)) {
                 JSONObject jo = new JSONObject();
                 jo.put("vmName", virtualMachineSummary.getConfig().getName());
                 jo.put("isTemplate", virtualMachineSummary.getConfig().isTemplate());
@@ -39,6 +39,7 @@ public class VCGetVMList extends VCTaskBase {
                 jo.put("memoryByMb", virtualMachineSummary.getConfig().getMemorySizeMB());
                 jo.put("CPUByNum", virtualMachineSummary.getConfig().getNumCpu());
                 jo.put("guestFullName", virtualMachineSummary.getConfig().getGuestFullName());
+                jo.put("adminID", virtualMachineSummary.getConfig().getAnnotation().equalsIgnoreCase(adminID));
                 JsonVmList.add(jo);
             }
         }

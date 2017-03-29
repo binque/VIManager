@@ -55,9 +55,9 @@ public class VCHostInfo extends VCTaskBase {
 
 			JsonHostInfo.add(jo);
 
-			//logger.debug("CPU total:"+cpuTotalSize+"CPU ued "+quickStates.getOverallCpuUsage());
-			//logger.debug("cpu used percent "+cpuUsedPercent);
-			//logger.debug("mem size :"+memTotalSize+" used :"+memUsedSize);
+			//logger.info("CPU total:"+cpuTotalSize+"CPU ued "+quickStates.getOverallCpuUsage());
+			//logger.info("cpu used percent "+cpuUsedPercent);
+			//logger.info("mem size :"+memTotalSize+" used :"+memUsedSize);
 
 			//info = quickStates.getOverallMemoryUsage().toString();
 		}
