@@ -20,23 +20,23 @@ public class ClientTest {
             // VCConfigVM.run("CloneTest", "update", "memory", "normal", "", "");
 
             // 获取虚拟机名称列表
-            String vmList = VCGetVMList.run("Datacenter", null);
-            System.out.println(vmList);
+            //String vmList = VCGetVMList.run("Datacenter", null);
+            //System.out.println(vmList);
 
             // 获取主机信息
-            VCHostInfo.setHostName("10.251.0.16");
-            String hostInfo = VCHostInfo.run();
-            System.out.println(hostInfo);
+            //String hostInfo = VCHostInfo.run();
+            //System.out.println(hostInfo);
 
             // 获取许可证信息
-            String licenseInfo = VCLicensesInfo.run();
-            System.out.println(licenseInfo);
+            //String licenseInfo = VCLicensesInfo.run();
+            //System.out.println(licenseInfo);
 
             // 获取存储信息
             String storageInfo = VCStorageInfo.run();
             System.out.println(storageInfo);
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println(e.getMessage());
         } finally {
             try {
                 VCClientSession.Disconnect();

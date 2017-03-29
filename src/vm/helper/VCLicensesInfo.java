@@ -1,6 +1,8 @@
 package vm.helper;
 
 import com.vmware.vim25.*;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -13,8 +15,7 @@ public class VCLicensesInfo extends VCTaskBase {
     private static List<LicenseAssignmentManagerLicenseAssignment> licenses;
 
     private static void initLicAssignmentManagerRef() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
-        licenseAssignmentManagerRef = (ManagedObjectReference) VCHelper.entityProps(licManagerRef,
-                new String[]{"licenseAssignmentManager"}).get("licenseAssignmentManager");
+        licenseAssignmentManagerRef = (ManagedObjectReference) VCHelper.entityProps(licManagerRef, new String[]{"licenseAssignmentManager"}).get("licenseAssignmentManager");
     }
 
     private static void initLicenseAssignmentManagerLicenseAssignments() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
@@ -22,8 +23,7 @@ public class VCLicensesInfo extends VCTaskBase {
     }
 
     private static String getInfo() {
-        StringBuilder JsonInfo = new StringBuilder();
-        JsonInfo.append("[");
+        JSONArray JsonInfo = new JSONArray();
         for (LicenseAssignmentManagerLicenseAssignment license : licenses) {
             LicenseManagerLicenseInfo assignedLicense = license.getAssignedLicense();
             //List<KeyAnyValue> propertys = license.getProperties();
@@ -32,16 +32,17 @@ public class VCLicensesInfo extends VCTaskBase {
                     LicenseManagerEvaluationInfo lsInfo = (LicenseManagerEvaluationInfo) property.getValue();
                     for (KeyAnyValue propertyOfDay : lsInfo.getProperties()) {
                         if (propertyOfDay.getKey().equalsIgnoreCase("expirationDate")) {
-                            JsonInfo.append(String.format("{ \"Name of the Licnese\":%s, \"Key of the License\":%s, \"Date of the expiration\":%s}",
-                                    assignedLicense.getName(), assignedLicense.getLicenseKey(), propertyOfDay.getValue()));
-                            //System.out.println(assignedLicense.getName()+" "+assignedLicense.getLicenseKey()+" "+assignedLicense.getEditionKey()+" "+propertyOfDay.getKey()+" "+propertyOfDay.getValue());
+                            JSONObject jo = new JSONObject();
+                            jo.put("Name of the Licnese", assignedLicense.getName());
+                            jo.put("Key of the License", assignedLicense.getLicenseKey());
+                            jo.put("Date of the expiration", propertyOfDay.getValue().toString());
+                            JsonInfo.add(jo);
+                            //logger.debug(assignedLicense.getName()+" "+assignedLicense.getLicenseKey()+" "+assignedLicense.getEditionKey()+" "+propertyOfDay.getKey()+" "+propertyOfDay.getValue());
                         }
                     }
                 }
             }
         }
-        JsonInfo.deleteCharAt(JsonInfo.length() - 2);
-        JsonInfo.append("]");
         return JsonInfo.toString();
     }
 

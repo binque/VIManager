@@ -7,6 +7,8 @@ package vm.helper;
 import com.vmware.vim25.*;
 import org.w3c.dom.Element;
 
+import org.apache.log4j.Logger;
+
 import javax.net.ssl.*;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.soap.SOAPFaultException;
@@ -22,6 +24,8 @@ import java.util.Map;
  * @功能描述 客户程序的登陆、登出和认证
  */
 public class VCClientSession {
+    private static Logger logger = Logger.getLogger(VCClientSession.class);
+
     private static final String url = "https://10.251.0.20:8000/sdk";
     private static final String username = "administrator@vsphere.local";
     private static final String password = "@Vmware123";
@@ -125,8 +129,8 @@ public class VCClientSession {
         perfManager = serviceContent.getPerfManager();
         propCollectorRef = serviceContent.getPropertyCollector();
 
-        System.out.println(serviceContent.getAbout().getFullName());
-        System.out.println("Server type is " + serviceContent.getAbout().getApiType());
+        logger.debug(serviceContent.getAbout().getFullName());
+        logger.debug("Server type is " + serviceContent.getAbout().getApiType());
     }
 
     /**
@@ -143,12 +147,12 @@ public class VCClientSession {
      * @功能描述 打印错误信息
      */
     private static void printSoapFaultException(SOAPFaultException sfe) {
-        System.out.println("Soap fault: ");
+        logger.error("Soap fault: ");
         if (sfe.getFault().hasDetail()) {
-            System.out.println(sfe.getFault().getDetail().getFirstChild().getLocalName());
+            logger.error(sfe.getFault().getDetail().getFirstChild().getLocalName());
         }
         if (sfe.getFault().getFaultString() != null) {
-            System.out.println("Message: " + sfe.getFault().getFaultString());
+            logger.error("Message: " + sfe.getFault().getFaultString());
         }
     }
 

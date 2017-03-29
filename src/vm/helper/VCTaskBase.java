@@ -1,6 +1,7 @@
 package vm.helper;
 
 import com.vmware.vim25.*;
+import org.apache.log4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -12,10 +13,13 @@ import java.util.List;
 
 /**
  * Created by huxia on 2017/3/19.
+ * Completed By Huxiao
  */
 public class VCTaskBase {
-    protected static VimPortType vimPort;
+    static VimPortType vimPort;
     protected static ServiceContent serviceContent;
+
+    protected static Logger logger = Logger.getLogger(VCTaskBase.class);
 
     protected static void init() throws InvalidLoginFaultMsg, NoSuchAlgorithmException, RuntimeFaultFaultMsg, InvalidLocaleFaultMsg, KeyManagementException {
         if (!VCClientSession.IsConnected()) {
@@ -30,7 +34,7 @@ public class VCTaskBase {
      * @return 表示任务结果的布尔值
      * @功能描述 此方法返回一个布尔值，指定任务是成功还是失败。
      */
-    protected static boolean getTaskResultAfterDone(ManagedObjectReference task) throws InvalidCollectorVersionFaultMsg, InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+    static boolean getTaskResultAfterDone(ManagedObjectReference task) throws InvalidCollectorVersionFaultMsg, InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
         boolean retValue = false;
 
         Object[] result = VCClientSession.WaitForValues(task, new String[]{"info.state", "info.error"}, new String[]{"state"},
@@ -46,7 +50,7 @@ public class VCTaskBase {
         return retValue;
     }
 
-    protected static Object getDynamicProperty(ManagedObjectReference mor, String propertyName) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InvalidLoginFaultMsg, NoSuchAlgorithmException, InvalidLocaleFaultMsg, KeyManagementException {
+    static Object getDynamicProperty(ManagedObjectReference mor, String propertyName) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InvalidLoginFaultMsg, NoSuchAlgorithmException, InvalidLocaleFaultMsg, KeyManagementException {
         ObjectContent[] objContent = getObjectProperties(mor, new String[]{propertyName});
 
         Object propertyValue = null;

@@ -1,6 +1,8 @@
 package vm.helper;
 
 import com.vmware.vim25.*;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -10,8 +12,7 @@ public class VCStorageInfo extends VCTaskBase {
 	private static String getInfo() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
 		long capability;//单位是b
 		long freeSpace;//单位是b
-		StringBuilder JsonStorage = new StringBuilder();
-		JsonStorage.append('[');
+		JSONArray JsonStorage = new JSONArray();
 		String[] infoName = {"summary"};
 		ManagedObjectReference container = serviceContent.getRootFolder();
 		Map<ManagedObjectReference, Map<String, Object>> datastoreMap = VCHelper.inContainerByType(container, "Datastore", infoName, new RetrieveOptions());
@@ -20,13 +21,15 @@ public class VCStorageInfo extends VCTaskBase {
 
 			capability = datastoreSummary.getCapacity();
 			freeSpace = datastoreSummary.getFreeSpace();
-			JsonStorage.append(String.format("{ \"Name of the datacenter\":%s, \"Total capability By B\":%s, \"Free space By B\":%s}", datastoreSummary.getName(), capability, freeSpace));
-			//System.out.println(" Name "+datastoreSummary.getName());
-			//System.out.println(datastoreSummary.getDatastore().getType()+" "+datastoreSummary.getDatastore().getValue()+" "+datastoreSummary.getUncommitted()+" "+datastoreSummary.getUrl());
+			JSONObject jo = new JSONObject();
+			jo.put("Name of the datacenter", datastoreSummary.getName());
+			jo.put("Total capability By B", capability);
+			jo.put("Free space By B", freeSpace);
+			JsonStorage.add(jo);
+			//logger.debug(" Name "+datastoreSummary.getName());
+			//logger.debug(datastoreSummary.getDatastore().getType()+" "+datastoreSummary.getDatastore().getValue()+" "+datastoreSummary.getUncommitted()+" "+datastoreSummary.getUrl());
 
 		}
-		JsonStorage.deleteCharAt(JsonStorage.length() - 2);
-		JsonStorage.append("]");
 		return JsonStorage.toString();
 	}
 

@@ -30,7 +30,7 @@ public class VCConfigVM extends VCTaskBase {
             if (virtualmachien != null) {
                 reConfig(virtualmachien, vmName, operation, device, value, diskSize, diskmode);
             } else {
-                System.out.printf("Virtual Machine named [ %s ] not found.", vmName);
+                logger.info(String.format("Virtual Machine named [ %s ] not found.", vmName));
             }
         }
     }
@@ -48,23 +48,23 @@ public class VCConfigVM extends VCTaskBase {
         VirtualMachineConfigSpec virtualMachineConfigSpec = new VirtualMachineConfigSpec();
 
         if (deviceType.equalsIgnoreCase("memory") && operation.equalsIgnoreCase("update")) {
-            System.out.printf("Reconfiguring The Virtual Machine [ %s ] For Memory Update", vmName);
+            logger.debug(String.format("Reconfiguring The Virtual Machine [ %s ] For Memory Update", vmName));
             try {
                 virtualMachineConfigSpec.setMemoryAllocation(getShares(value));
             } catch (NumberFormatException e) {
-                System.out.printf("Value of Memory update must be one of high|low|normal|[numeric value]");
+                logger.info("Value of Memory update must be one of high|low|normal|[numeric value]");
                 return;
             }
         } else if (deviceType.equalsIgnoreCase("cpu") && !operation.equalsIgnoreCase("update")) {
-            System.out.printf("Reconfiguring The Virtual Machine [ %s ] For CPU Update", vmName);
+            logger.debug(String.format("Reconfiguring The Virtual Machine [ %s ] For CPU Update", vmName));
             try {
                 virtualMachineConfigSpec.setCpuAllocation(getShares(value));
             } catch (NumberFormatException e) {
-                System.out.printf("Value of CPU update must be one of high|low|normal|[numeric value]");
+                logger.info("Value of CPU update must be one of high|low|normal|[numeric value]");
                 return;
             }
         } else if (deviceType.equalsIgnoreCase("disk") && !operation.equalsIgnoreCase("update")) {
-            System.out.printf("Reconfiguring The Virtual Machine [ %s ] For Disk Update", vmName);
+            logger.debug(String.format("Reconfiguring The Virtual Machine [ %s ] For Disk Update", vmName));
             VirtualDeviceConfigSpec virtualDeviceConfigSpec = getDiskDeviceConfigSpec(virtualMachine, vmName, operation, value, diskSize, diskmode);
             if (virtualDeviceConfigSpec != null) {
                 virtualMachineConfigSpec.getDeviceChange().add(virtualDeviceConfigSpec);
@@ -72,7 +72,7 @@ public class VCConfigVM extends VCTaskBase {
                 return;
             }
         } else if (deviceType.equalsIgnoreCase("nic") && !operation.equalsIgnoreCase("update")) {
-            System.out.printf("Reconfiguring The Virtual Machine [ %s ] For NIC Update", vmName);
+            logger.debug(String.format("Reconfiguring The Virtual Machine [ %s ] For NIC Update", vmName));
             VirtualDeviceConfigSpec virtualDeviceConfigSpec = getNICDeviceConfigSpec(virtualMachine, operation, value);
             if (virtualDeviceConfigSpec != null) {
                 virtualMachineConfigSpec.getDeviceChange().add(virtualDeviceConfigSpec);
@@ -80,7 +80,7 @@ public class VCConfigVM extends VCTaskBase {
                 return;
             }
         } else if (deviceType.equalsIgnoreCase("cd") && !operation.equalsIgnoreCase("update")) {
-            System.out.printf("Reconfiguring The Virtual Machine [ %s ] For CD Update", vmName);
+            logger.debug(String.format("Reconfiguring The Virtual Machine [ %s ] For CD Update", vmName));
             VirtualDeviceConfigSpec virtualDeviceConfigSpec = getCDDeviceConfigSpec(virtualMachine, operation, value);
             if (virtualDeviceConfigSpec != null) {
                 virtualMachineConfigSpec.getDeviceChange().add(virtualDeviceConfigSpec);
@@ -88,15 +88,15 @@ public class VCConfigVM extends VCTaskBase {
                 return;
             }
         } else {
-            System.out.println("Invalid device type [ memory | cpu | disk | nic | cd ]");
+            logger.info("Invalid device type [ memory | cpu | disk | nic | cd ]");
             return;
         }
 
         ManagedObjectReference tmor = vimPort.reconfigVMTask(virtualMachine, virtualMachineConfigSpec);
         if (getTaskResultAfterDone(tmor)) {
-            System.out.println("Virtual Machine reconfigured successfully");
+            logger.debug("Virtual Machine reconfigured successfully");
         } else {
-            System.out.println("Virtual Machine reconfigur failed");
+            logger.info("Virtual Machine reconfigur failed");
         }
     }
 
@@ -237,7 +237,7 @@ public class VCConfigVM extends VCTaskBase {
                 diskSpec.setFileOperation(VirtualDeviceConfigSpecFileOperation.DESTROY);
                 diskSpec.setDevice(disk);
             } else {
-                System.out.println("No device found " + value);
+                logger.info("No device found " + value);
                 return null;
             }
         }
@@ -315,7 +315,7 @@ public class VCConfigVM extends VCTaskBase {
             if (cdRemove != null) {
                 cdSpec.setDevice(cdRemove);
             } else {
-                System.out.println("No device available " + value);
+                logger.info("No device available " + value);
                 return null;
             }
         }
@@ -349,7 +349,7 @@ public class VCConfigVM extends VCTaskBase {
             if (nic != null) {
                 nicSpec.setDevice(nic);
             } else {
-                System.out.println("No device available " + value);
+                logger.info("No device available " + value);
                 return null;
             }
         }
@@ -371,29 +371,29 @@ public class VCConfigVM extends VCTaskBase {
         if (device.equalsIgnoreCase("disk")) {
             if (operation.equalsIgnoreCase("add")) {
                 if ((disksize == null) || (diskmode == null)) {
-                    System.out.println("For add disk operation, disksize and diskmode are the Mandatory options");
+                    logger.info("For add disk operation, disksize and diskmode are the Mandatory options");
                     flag = false;
                 }
                 if (disksize != null && Integer.parseInt(disksize) <= 0) {
-                    System.out.println("Disksize must be a greater than zero");
+                    logger.info("Disksize must be a greater than zero");
                     flag = false;
                 }
             }
             if (operation.equalsIgnoreCase("remove")) {
                 if (value == null) {
-                    System.out.println("Please specify a label in value field to remove the disk");
+                    logger.info("Please specify a label in value field to remove the disk");
                 }
             }
         }
         if (device.equalsIgnoreCase("nic")) {
             if (operation == null) {
-                System.out.println("For add nic operation is the Mandatory option");
+                logger.info("For add nic operation is the Mandatory option");
                 flag = false;
             }
         }
         if (device.equalsIgnoreCase("cd")) {
             if (operation == null) {
-                System.out.println("For add cd operation is the Mandatory options");
+                logger.info("For add cd operation is the Mandatory options");
                 flag = false;
             }
         }
@@ -403,12 +403,12 @@ public class VCConfigVM extends VCTaskBase {
                     || operation.equalsIgnoreCase("update")) {
                 if (device.equals("cpu") || device.equals("memory")) {
                     if (!operation.equals("update")) {
-                        System.out.println("Invalid operation specified for device cpu or memory");
+                        logger.info("Invalid operation specified for device cpu or memory");
                         flag = false;
                     }
                 }
             } else {
-                System.out.println("Operation must be either add, remove or update");
+                logger.info("Operation must be either add, remove or update");
                 flag = false;
             }
         }

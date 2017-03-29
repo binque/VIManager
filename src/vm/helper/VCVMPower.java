@@ -57,7 +57,7 @@ public class VCVMPower extends VCTaskBase {
 	//对是否是参数是否合法进行验证
 	private void validate() throws IllegalArgumentException {
 		if (all && (vmName != null || datacenter != null || guestId != null || host != null)) {
-			System.out.println("Did you really mean all? " + "Use '--all true' by itself " +
+			logger.info("Did you really mean all? " + "Use '--all true' by itself " +
 					"not with --vmname or --datacentername or --guestid or --hostname");
 			throw new IllegalArgumentException("--all true occurred in conjunction with other options");
 		}
@@ -69,7 +69,7 @@ public class VCVMPower extends VCTaskBase {
 				&& !(operation.equalsIgnoreCase("reboot"))
 				&& !(operation.equalsIgnoreCase("suspend"))) {
 
-			System.out.println("Invalid Operation name ' " + operation
+			logger.info("Invalid Operation name ' " + operation
 					+ "' valid operations are poweron, standby,"
 					+ " poweroff, standby, reboot, shutdown, suspend");
 			throw new IllegalArgumentException("Invalid Operation Type Or Name");
@@ -87,10 +87,10 @@ public class VCVMPower extends VCTaskBase {
 		if (datacenter != null) {
 			Map<String, ManagedObjectReference> datacenters =
 					VCHelper.inContainerByType(container, "Datacenter");
-			System.out.println("Number of datacenters found: " + datacenters.size());
+			logger.debug("Number of datacenters found: " + datacenters.size());
 			ManagedObjectReference dcMoref = datacenters.get(datacenter);
 			if (dcMoref == null) {
-				System.out.println("No datacenter by the name " + datacenter
+				logger.info("No datacenter by the name " + datacenter
 						+ " found!");
 			}
 			container = dcMoref;
@@ -100,7 +100,7 @@ public class VCVMPower extends VCTaskBase {
 			ManagedObjectReference hostMoref =
 					VCHelper.inContainerByType(container, "HostSystem").get(host);
 			if (hostMoref == null) {
-				System.out.println("No host by the name " + host + " found!");
+				logger.info("No host by the name " + host + " found!");
 				return vmList;
 			}
 			container = hostMoref;
@@ -141,7 +141,7 @@ public class VCVMPower extends VCTaskBase {
 	private void runOperation() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
 		Map<String, ManagedObjectReference> vmMap = getVms();
 		if (vmMap == null || vmMap.isEmpty()) {
-			System.out.println("No Virtual Machine found matching "
+			logger.info("No Virtual Machine found matching "
 					+ "the specified criteria");
 		} else {
 			if (operation.equalsIgnoreCase("poweron")) {
@@ -166,17 +166,17 @@ public class VCVMPower extends VCTaskBase {
 		for (String vmname : vmMap.keySet()) {
 			ManagedObjectReference vmMor = vmMap.get(vmname);
 			try {
-				System.out.println("Powering on virtual machine : " + vmname + "["
+				logger.debug("Powering on virtual machine : " + vmname + "["
 						+ vmMor.getValue() + "]");
 				ManagedObjectReference taskmor = VCClientSession.getVimPort().powerOnVMTask(vmMor, null);
 				if (getTaskResultAfterDone(taskmor)) {
-					System.out.println(vmname + "[" + vmMor.getValue()
+					logger.debug(vmname + "[" + vmMor.getValue()
 							+ "] powered on successfully");
 				}
 			} catch (Exception e) {
-				System.out.println("Unable to poweron vm : " + vmname + "["
+				logger.info("Unable to poweron vm : " + vmname + "["
 						+ vmMor.getValue() + "]");
-				System.err.println("Reason :" + e.getLocalizedMessage());
+				logger.info("Reason :" + e.getLocalizedMessage());
 			}
 		}
 	}
@@ -185,17 +185,17 @@ public class VCVMPower extends VCTaskBase {
 		for (String vmname : vmMap.keySet()) {
 			ManagedObjectReference vmMor = vmMap.get(vmname);
 			try {
-				System.out.println("Powering off virtual machine : " + vmname + "["
+				logger.debug("Powering off virtual machine : " + vmname + "["
 						+ vmMor.getValue() + "]");
 				ManagedObjectReference taskmor = VCClientSession.getVimPort().powerOffVMTask(vmMor);
 				if (getTaskResultAfterDone(taskmor)) {
-					System.out.println(vmname + "[" + vmMor.getValue()
+					logger.debug(vmname + "[" + vmMor.getValue()
 							+ "] powered off successfully");
 				}
 			} catch (Exception e) {
-				System.out.println("Unable to poweroff vm : " + vmname + "["
+				logger.info("Unable to poweroff vm : " + vmname + "["
 						+ vmMor.getValue() + "]");
-				System.err.println("Reason :" + e.getLocalizedMessage());
+				logger.info("Reason :" + e.getLocalizedMessage());
 			}
 		}
 	}
@@ -204,15 +204,15 @@ public class VCVMPower extends VCTaskBase {
 		for (String vmname : vmMap.keySet()) {
 			ManagedObjectReference vmMor = vmMap.get(vmname);
 			try {
-				System.out.println("Reseting virtual machine : " + vmname + "["
+				logger.debug("Reseting virtual machine : " + vmname + "["
 						+ vmMor.getValue() + "]");
 				ManagedObjectReference taskmor = VCClientSession.getVimPort().resetVMTask(vmMor);
 				if (getTaskResultAfterDone(taskmor)) {
-					System.out.println(vmname + "[" + vmMor.getValue()
+					logger.debug(vmname + "[" + vmMor.getValue()
 							+ "] reset successfully");
 				}
 			} catch (Exception e) {
-				System.out.println("Unable to reset vm : " + vmname + "["
+				logger.info("Unable to reset vm : " + vmname + "["
 						+ vmMor.getValue() + "]");
 				System.err.println("Reason :" + e.getLocalizedMessage());
 			}
@@ -223,15 +223,15 @@ public class VCVMPower extends VCTaskBase {
 		for (String vmname : vmMap.keySet()) {
 			ManagedObjectReference vmMor = vmMap.get(vmname);
 			try {
-				System.out.println("Suspending virtual machine : " + vmname + "["
+				logger.debug("Suspending virtual machine : " + vmname + "["
 						+ vmMor.getValue() + "]");
 				ManagedObjectReference taskmor = VCClientSession.getVimPort().suspendVMTask(vmMor);
 				if (getTaskResultAfterDone(taskmor)) {
-					System.out.println(vmname + "[" + vmMor.getValue()
+					logger.debug(vmname + "[" + vmMor.getValue()
 							+ "] suspended successfully");
 				}
 			} catch (Exception e) {
-				System.out.println("Unable to suspend vm : " + vmname + "["
+				logger.info("Unable to suspend vm : " + vmname + "["
 						+ vmMor.getValue() + "]");
 				System.err.println("Reason :" + e.getLocalizedMessage());
 			}
@@ -242,13 +242,13 @@ public class VCVMPower extends VCTaskBase {
 		for (String vmname : vmMap.keySet()) {
 			ManagedObjectReference vmMor = vmMap.get(vmname);
 			try {
-				System.out.println("Rebooting guest os in virtual machine : "
+				logger.debug("Rebooting guest os in virtual machine : "
 						+ vmname + "[" + vmMor.getValue() + "]");
 				VCClientSession.getVimPort().rebootGuest(vmMor);
-				System.out.println("Guest os in vm : " + vmname + "["
+				logger.debug("Guest os in vm : " + vmname + "["
 						+ vmMor.getValue() + "]" + " rebooted");
 			} catch (Exception e) {
-				System.out.println("Unable to reboot guest os in vm : " + vmname
+				logger.info("Unable to reboot guest os in vm : " + vmname
 						+ "[" + vmMor.getValue() + "]");
 				System.err.println("Reason :" + e.getLocalizedMessage());
 			}
@@ -259,13 +259,13 @@ public class VCVMPower extends VCTaskBase {
 		for (String vmname : vmMap.keySet()) {
 			ManagedObjectReference vmMor = vmMap.get(vmname);
 			try {
-				System.out.println("Shutting down guest os in virtual machine : "
+				logger.debug("Shutting down guest os in virtual machine : "
 						+ vmname + "[" + vmMor.getValue() + "]");
 				VCClientSession.getVimPort().shutdownGuest(vmMor);
-				System.out.println("Guest os in vm : " + vmname + "["
+				logger.debug("Guest os in vm : " + vmname + "["
 						+ vmMor.getValue() + "]" + " shutdown");
 			} catch (Exception e) {
-				System.out.println("Unable to shutdown guest os in vm : " + vmname
+				logger.info("Unable to shutdown guest os in vm : " + vmname
 						+ "[" + vmMor.getValue() + "]");
 				System.err.println("Reason :" + e.getLocalizedMessage());
 			}
@@ -276,13 +276,13 @@ public class VCVMPower extends VCTaskBase {
 		for (String vmname : vmMap.keySet()) {
 			ManagedObjectReference vmMor = vmMap.get(vmname);
 			try {
-				System.out.println("Putting the guest os in virtual machine : "
+				logger.debug("Putting the guest os in virtual machine : "
 						+ vmname + "[" + vmMor.getValue() + "] in standby mode");
 				VCClientSession.getVimPort().standbyGuest(vmMor);
-				System.out.println("Guest os in vm : " + vmname + "["
+				logger.debug("Guest os in vm : " + vmname + "["
 						+ vmMor.getValue() + "]" + " in standby mode");
 			} catch (Exception e) {
-				System.out.println("Unable to put the guest os in vm : " + vmname
+				logger.info("Unable to put the guest os in vm : " + vmname
 						+ "[" + vmMor.getValue() + "] to standby mode");
 				System.err.println("Reason :" + e.getLocalizedMessage());
 			}
@@ -303,7 +303,7 @@ public class VCVMPower extends VCTaskBase {
 			vmName = null;
 			datacenter = null;
 			host = null;
-			System.out.println("Power operations will be broadcast to ALL virtual machines.");
+			logger.info("Power operations will be broadcast to ALL virtual machines.");
 			run = true;
 		} else if (vmName == null
 				&& datacenter == null

@@ -15,24 +15,24 @@ import static vm.helper.VCClientSession.Disconnect;
  */
 @WebService
 public class VCManager {
-    /**     * @param VMID     虚拟机的名字
+    /**     * @param vmName     虚拟机的名字
      * @param CPU      给虚拟机分配的cpu核心数目
-     * @param RAM      给虚拟机分配的内存大小
+     * @param memory   给虚拟机分配的内存大小
      * @param Disk     给虚拟机分配的磁盘空间大小
      * @param NetLimit 网络限制
      * @return 如果成功则返回null，否则返回表示错误信息的字符串
      * @功能描述 编辑虚拟机配置
      */
     @WebMethod
-    public String ChangeConfig(String VMID, String CPU, String RAM, String Disk, String NetLimit) {
+    public String ChangeConfig(String vmName, String CPU, String memory, String Disk, String NetLimit) {
         String retVal = "";
 
         try {
-            if (VMID != null && !VMID.isEmpty() && CPU.equals("low") || CPU.equals("normal") || CPU.equals("high")) {
-                VCConfigVM.run(VMID, "update", "cpu", CPU, "", "");
+            if (vmName != null && !vmName.isEmpty() && CPU.equals("low") || CPU.equals("normal") || CPU.equals("high")) {
+                VCConfigVM.run(vmName, "update", "cpu", CPU, "", "");
             }
-            if (VMID != null && !VMID.isEmpty() && RAM.equals("low") || RAM.equals("normal") || RAM.equals("high")) {
-                VCConfigVM.run(VMID, "update", "memory", RAM, "", "");
+            if (vmName != null && !vmName.isEmpty() && memory.equals("low") || memory.equals("normal") || memory.equals("high")) {
+                VCConfigVM.run(vmName, "update", "memory", memory, "", "");
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -47,8 +47,7 @@ public class VCManager {
     /*
      * @param name 主机名字如10.251.0.16
      */
-    public String GetHostInfo(String name) {
-        VCHostInfo.setHostName(name);
+    public String GetHostInfo() {
         String info = "";
         try {
             info = VCHostInfo.run();
@@ -99,25 +98,25 @@ public class VCManager {
     }
     
     /**
-     * @param VMID 虚拟机的名字
+     * @param vmName 虚拟机的名字
      * @param Op   操作的名字，可以使poweron、shutdown、reboot等
      * @return 如果成功则返回null，否则返回表示错误信息的字符串
      * @功能描述 对虚拟机进行的基本操作
      */
     @WebMethod
-    public String BasicOps(String VMID, String Op) {
+    public String BasicOps(String vmName, String Op) {
         String retVal = "";
-        if (VMID != null && Op != null && (!(VMID.isEmpty() || Op.isEmpty()))) {
+        if (vmName != null && Op != null && (!(vmName.isEmpty() || Op.isEmpty()))) {
             try {
                 switch (Op.toLowerCase()) {
                     case "delete": {
-                        VCDeleteEntity.run(VMID);
+                        VCDeleteEntity.run(vmName);
                         Disconnect();
                         retVal = "success finished.";
                     }
                     case "poweron": {
                         VCVMPower vm = new VCVMPower();
-                        vm.setVmName(VMID);
+                        vm.setVmName(vmName);
                         vm.setOperation("poweron");
                         vm.run();
                         Disconnect();
@@ -125,7 +124,7 @@ public class VCManager {
                     }
                     case "poweroff": {
                         VCVMPower vm = new VCVMPower();
-                        vm.setVmName(VMID);
+                        vm.setVmName(vmName);
                         vm.setOperation("poweroff");
                         vm.run();
                         Disconnect();
@@ -133,7 +132,7 @@ public class VCManager {
                     }
                     case "reboot": {
                         VCVMPower vm = new VCVMPower();
-                        vm.setVmName(VMID);
+                        vm.setVmName(vmName);
                         vm.setOperation("reboot");
                         vm.run();
                         Disconnect();
@@ -156,16 +155,16 @@ public class VCManager {
 
     /**
      * @param templateID 模板名称
-     * @param VMID       虚拟机名称
+     * @param vmName       虚拟机名称
      * @return 如果任务执行完成（不意味着虚拟机创建完成），返回以success开始的字符串；否则返回以error开始，表示错误信息的字符串
      * @功能描述 从模板创建一个虚拟机
      */
     @WebMethod
-    public String CreateFromTemplate(String templateID, String VMID, String adminID) {
+    public String CreateFromTemplate(String templateID, String vmName, String adminID) {
         String retVal = "";
-        if (templateID != null && !templateID.isEmpty() && VMID != null && !VMID.isEmpty()) {
+        if (templateID != null && !templateID.isEmpty() && vmName != null && !vmName.isEmpty()) {
             try {
-                VCCloneVM.run("Datacenter", "Datacenter/vm/" + templateID, VMID, adminID);
+                VCCloneVM.run("Datacenter", "Datacenter/vm/" + templateID, vmName, adminID);
                 retVal = "success finished.";
             } catch (Throwable e) {
                 e.printStackTrace();
@@ -180,69 +179,69 @@ public class VCManager {
     }
 
     /**
-     * @param VMID      虚拟机名称
+     * @param vmName      虚拟机名称
      * @param targetDir 目标目录
      * @return 如果成功则返回null，否则返回表示错误信息的字符串
      * @功能描述 到处虚拟机到目标目录
      */
     @WebMethod
-    public String ExportVM(String VMID, String targetDir) {
+    public String ExportVM(String vmName, String targetDir) {
         return null;
     }
 
     /**
-     * @param VMID 虚拟机名称
+     * @param vmName 虚拟机名称
      * @return 如果成功则返回表示虚拟机信息的字符串，否则返回表示错误信息的字符串
      * @功能描述 获得虚拟机信息
      */
     @WebMethod
-    public String GetVMInfor(String VMID) {
+    public String GetVMInfor(String vmName) {
         return null;
     }
 
     /**
-     * @param VMID     虚拟机名称
+     * @param vmName     虚拟机名称
      * @param PerfUnit perf
      * @return 如果成功则返回null，否则返回表示错误信息的字符串
      */
     @WebMethod
-    public String GetPerf(String VMID, String PerfUnit) {
+    public String GetPerf(String vmName, String PerfUnit) {
         return null;
     }
 
     /**
-     * @param VMID         虚拟机名称
+     * @param vmName         虚拟机名称
      * @param op           操作
      * @param snapshotname 快照名称
      * @return 如果成功则返回null，否则返回表示错误信息的字符串
      * @功能描述 虚拟机快照
      */
     @WebMethod
-    public String SnapShotOps(String VMID, String op, String snapshotname) {
+    public String SnapShotOps(String vmName, String op, String snapshotname) {
         return null;
     }
 
     /**
-     * @param VMID    虚拟机名称
+     * @param vmName    虚拟机名称
      * @param fileDir 例程路径
      * @param args    执行参数
      * @return 如果成功则返回null，否则返回表示错误信息的字符串
      * @功能描述 执行虚拟机上的例程
      */
     @WebMethod
-    public String RunGuestProgram(String VMID, String fileDir, String args) {
+    public String RunGuestProgram(String vmName, String fileDir, String args) {
         return null;
     }
 
     /**
-     * @param VMID            虚拟机名称
+     * @param vmName           虚拟机名称
      * @param filePathLocal   源位置（本机路径）
      * @param filePathInGuest 目标位置（客户集中的路径）
      * @return 如果成功则返回null，否则返回表示错误信息的字符串
      * @功能描述 将文件上传到虚拟机中
      */
     @WebMethod
-    public String UploadFile(String VMID, String filePathLocal, String filePathInGuest) {
+    public String UploadFile(String vmName, String filePathLocal, String filePathInGuest) {
         return null;
     }
 

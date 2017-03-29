@@ -23,19 +23,19 @@ public class VCCloneVM extends VCTaskBase {
         // 找到数据中心的对象引用
         ManagedObjectReference datacenterRef = vimPort.findByInventoryPath(serviceContent.getSearchIndex(), datacenterName);
         if (datacenterRef == null) {
-            System.out.printf("The specified datacenter [ %s ]is not found %n", datacenterName);
+            logger.info(String.format("The specified datacenter [ %s ]is not found %n", datacenterName));
             return;
         }
 
         // 找到这个虚拟机的目录
         ManagedObjectReference vmFolderRef = (ManagedObjectReference) getDynamicProperty(datacenterRef, "vmFolder");
         if (vmFolderRef == null) {
-            System.out.printf("The virtual machine is not found");
+            logger.info("The virtual machine is not found");
             return;
         }
         ManagedObjectReference vmRef = vimPort.findByInventoryPath(serviceContent.getSearchIndex(), vmPathName);
         if (vmRef == null) {
-            System.out.printf("The VMPath specified [ %s ] is not found %n", vmPathName);
+            logger.info(String.format("The VMPath specified [ %s ] is not found %n", vmPathName));
             return;
         }
 
@@ -58,12 +58,12 @@ public class VCCloneVM extends VCTaskBase {
         }
         cloneSpec.getConfig().setManagedBy(mbinfo);
 
-        System.out.printf("Cloning Virtual Machine [%s] to clone name [%s] %n", vmPathName.substring(vmPathName.lastIndexOf("/") + 1), cloneName);
+        logger.debug(String.format("Cloning Virtual Machine [%s] to clone name [%s] %n", vmPathName.substring(vmPathName.lastIndexOf("/") + 1), cloneName));
         ManagedObjectReference cloneTask = vimPort.cloneVMTask(vmRef, vmFolderRef, cloneName, cloneSpec);
         if (getTaskResultAfterDone(cloneTask)) {
-            System.out.printf("Successfully cloned Virtual Machine [%s] to clone name [%s] %n", vmPathName.substring(vmPathName.lastIndexOf("/") + 1), cloneName);
+            logger.debug(String.format("Successfully cloned Virtual Machine [%s] to clone name [%s] %n", vmPathName.substring(vmPathName.lastIndexOf("/") + 1), cloneName));
         } else {
-            System.out.printf("Failure Cloning Virtual Machine [%s] to clone name [%s] %n", vmPathName.substring(vmPathName.lastIndexOf("/") + 1), cloneName);
+            logger.info(String.format("Failure Cloning Virtual Machine [%s] to clone name [%s] %n", vmPathName.substring(vmPathName.lastIndexOf("/") + 1), cloneName));
         }
     }
 

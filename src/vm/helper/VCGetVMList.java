@@ -1,6 +1,8 @@
 package vm.helper;
 
 import com.vmware.vim25.*;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -23,22 +25,23 @@ public class VCGetVMList extends VCTaskBase {
 
         Map<ManagedObjectReference, Map<String, Object>> vmList = VCHelper.inContainerByType(vmFolder, "VirtualMachine", props, new RetrieveOptions());
 
-        StringBuilder JsonVmList = new StringBuilder();
-        JsonVmList.append('[');
+        JSONArray JsonVmList = new JSONArray();
 
         for (Map<String, Object> val : vmList.values()) {
             VirtualMachineSummary virtualMachineSummary = (VirtualMachineSummary) (val.get(props[0]));
             if (adminID == null || virtualMachineSummary.getConfig().getManagedBy().getExtensionKey().equalsIgnoreCase(adminID)) {
-                String runtimeState = virtualMachineSummary.getOverallStatus().value();
-
-                JsonVmList.append(String.format("{ \"vmName\":%s,\"isTemplate\":%s,\"powerState\":%s,\"runTimeState\":%s,\"diskByB\":%s,\"memoryByMb\":%s,\"CPUByNum\":%s,\"guestFullName\":%s }, ",
-                        virtualMachineSummary.getConfig().getName(), virtualMachineSummary.getConfig().isTemplate(), virtualMachineSummary.getRuntime().getPowerState().value(), runtimeState,
-                        virtualMachineSummary.getStorage().getCommitted(), virtualMachineSummary.getConfig().getMemorySizeMB(), virtualMachineSummary.getConfig().getNumCpu(), virtualMachineSummary.getConfig().getGuestFullName()));
+                JSONObject jo = new JSONObject();
+                jo.put("vmName", virtualMachineSummary.getConfig().getName());
+                jo.put("isTemplate", virtualMachineSummary.getConfig().isTemplate());
+                jo.put("powerState", virtualMachineSummary.getRuntime().getPowerState().value());
+                jo.put("runTimeState", virtualMachineSummary.getOverallStatus().value());
+                jo.put("diskByB", virtualMachineSummary.getStorage().getCommitted());
+                jo.put("memoryByMb", virtualMachineSummary.getConfig().getMemorySizeMB());
+                jo.put("CPUByNum", virtualMachineSummary.getConfig().getNumCpu());
+                jo.put("guestFullName", virtualMachineSummary.getConfig().getGuestFullName());
+                JsonVmList.add(jo);
             }
         }
-        JsonVmList.deleteCharAt(JsonVmList.length() - 2);
-        JsonVmList.append("]");
-
         return JsonVmList.toString();
     }
 
