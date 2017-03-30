@@ -2,6 +2,8 @@ package vm.helper;
 
 import com.vmware.vim25.*;
 
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 
@@ -83,7 +85,7 @@ public class VCVMPower extends VCTaskBase {
 		Map<String, ManagedObjectReference> vmList = new HashMap<>();
 
 		// Start from the root folder
-		ManagedObjectReference container = VCClientSession.getServiceContent().getRootFolder();
+		ManagedObjectReference container = serviceContent.getRootFolder();
 		if (datacenter != null) {
 			Map<String, ManagedObjectReference> datacenters =
 					VCHelper.inContainerByType(container, "Datacenter");
@@ -168,7 +170,7 @@ public class VCVMPower extends VCTaskBase {
 			try {
 				logger.info("Powering on virtual machine : " + vmname + "["
 						+ vmMor.getValue() + "]");
-				ManagedObjectReference taskmor = VCClientSession.getVimPort().powerOnVMTask(vmMor, null);
+				ManagedObjectReference taskmor = vimPort.powerOnVMTask(vmMor, null);
 				if (getTaskResultAfterDone(taskmor)) {
 					logger.info(vmname + "[" + vmMor.getValue()
 							+ "] powered on successfully");
@@ -187,7 +189,7 @@ public class VCVMPower extends VCTaskBase {
 			try {
 				logger.info("Powering off virtual machine : " + vmname + "["
 						+ vmMor.getValue() + "]");
-				ManagedObjectReference taskmor = VCClientSession.getVimPort().powerOffVMTask(vmMor);
+				ManagedObjectReference taskmor = vimPort.powerOffVMTask(vmMor);
 				if (getTaskResultAfterDone(taskmor)) {
 					logger.info(vmname + "[" + vmMor.getValue()
 							+ "] powered off successfully");
@@ -206,7 +208,7 @@ public class VCVMPower extends VCTaskBase {
 			try {
 				logger.info("Reseting virtual machine : " + vmname + "["
 						+ vmMor.getValue() + "]");
-				ManagedObjectReference taskmor = VCClientSession.getVimPort().resetVMTask(vmMor);
+				ManagedObjectReference taskmor = vimPort.resetVMTask(vmMor);
 				if (getTaskResultAfterDone(taskmor)) {
 					logger.info(vmname + "[" + vmMor.getValue()
 							+ "] reset successfully");
@@ -225,7 +227,7 @@ public class VCVMPower extends VCTaskBase {
 			try {
 				logger.info("Suspending virtual machine : " + vmname + "["
 						+ vmMor.getValue() + "]");
-				ManagedObjectReference taskmor = VCClientSession.getVimPort().suspendVMTask(vmMor);
+				ManagedObjectReference taskmor = vimPort.suspendVMTask(vmMor);
 				if (getTaskResultAfterDone(taskmor)) {
 					logger.info(vmname + "[" + vmMor.getValue()
 							+ "] suspended successfully");
@@ -244,7 +246,7 @@ public class VCVMPower extends VCTaskBase {
 			try {
 				logger.info("Rebooting guest os in virtual machine : "
 						+ vmname + "[" + vmMor.getValue() + "]");
-				VCClientSession.getVimPort().rebootGuest(vmMor);
+				vimPort.rebootGuest(vmMor);
 				logger.info("Guest os in vm : " + vmname + "["
 						+ vmMor.getValue() + "]" + " rebooted");
 			} catch (Exception e) {
@@ -261,7 +263,7 @@ public class VCVMPower extends VCTaskBase {
 			try {
 				logger.info("Shutting down guest os in virtual machine : "
 						+ vmname + "[" + vmMor.getValue() + "]");
-				VCClientSession.getVimPort().shutdownGuest(vmMor);
+				vimPort.shutdownGuest(vmMor);
 				logger.info("Guest os in vm : " + vmname + "["
 						+ vmMor.getValue() + "]" + " shutdown");
 			} catch (Exception e) {
@@ -278,7 +280,7 @@ public class VCVMPower extends VCTaskBase {
 			try {
 				logger.info("Putting the guest os in virtual machine : "
 						+ vmname + "[" + vmMor.getValue() + "] in standby mode");
-				VCClientSession.getVimPort().standbyGuest(vmMor);
+				vimPort.standbyGuest(vmMor);
 				logger.info("Guest os in vm : " + vmname + "["
 						+ vmMor.getValue() + "]" + " in standby mode");
 			} catch (Exception e) {
@@ -289,10 +291,13 @@ public class VCVMPower extends VCTaskBase {
 		}
 	}
 
-	public void run() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+	public void run() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg, InvalidLoginFaultMsg, NoSuchAlgorithmException, InvalidLocaleFaultMsg, KeyManagementException {
 		validate();
-		if (checkOptions())
+		if (checkOptions()) {
+			init();
 			runOperation();
+			VCClientSession.Disconnect();
+		}
 	}
 
 	private boolean checkOptions() {

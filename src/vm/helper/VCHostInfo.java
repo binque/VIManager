@@ -66,10 +66,9 @@ public class VCHostInfo extends VCTaskBase {
 	}
 
 	public static String run() throws KeyManagementException, NoSuchAlgorithmException, RuntimeFaultFaultMsg, InvalidLoginFaultMsg, InvalidLocaleFaultMsg, InvalidPropertyFaultMsg {
-		if (!VCClientSession.IsConnected()) {
-			VCClientSession.Connect();
-		}
 		init();
-		return getInfo();
+		String retVal = getInfo();
+		VCClientSession.Disconnect();
+		return retVal;
 	}
 }

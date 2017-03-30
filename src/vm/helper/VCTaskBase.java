@@ -22,9 +22,7 @@ public class VCTaskBase {
     protected static Logger logger = Logger.getLogger(VCTaskBase.class);
 
     protected static void init() throws InvalidLoginFaultMsg, NoSuchAlgorithmException, RuntimeFaultFaultMsg, InvalidLocaleFaultMsg, KeyManagementException {
-        if (!VCClientSession.IsConnected()) {
-            VCClientSession.Connect();
-        }
+        VCClientSession.Connect();
         vimPort = VCClientSession.getVimPort();
         serviceContent = VCClientSession.getServiceContent();
     }

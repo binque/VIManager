@@ -47,13 +47,12 @@ public class VCGetVMList extends VCTaskBase {
     }
 
     public static String run(String datacenterName, String adminID) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg, InvalidLoginFaultMsg, NoSuchAlgorithmException, InvalidLocaleFaultMsg, KeyManagementException {
-        if (!VCClientSession.IsConnected()) {
-            VCClientSession.Connect();
-        }
         init();
 
         // 找到数据中心
         ManagedObjectReference datacenter = vimPort.findByInventoryPath(serviceContent.getSearchIndex(), datacenterName);
+
+        VCClientSession.Disconnect();
 
         return getVmNamesByVmFolder(datacenter, adminID);
     }

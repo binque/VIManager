@@ -8,8 +8,6 @@ import vm.helper.*;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 
-import static vm.helper.VCClientSession.Disconnect;
-
 /**
  * @功能描述 web服务中暴露的接口，调用下列接口进行vsphere管理
  */
@@ -95,7 +93,6 @@ public class VCManager {
                 switch (Op.toLowerCase()) {
                     case "delete": {
                         VCDeleteEntity.run(vmName);
-                        Disconnect();
                         retVal = "success finished.";
                     }
                     case "poweron": {
@@ -103,7 +100,6 @@ public class VCManager {
                         vm.setVmName(vmName);
                         vm.setOperation("poweron");
                         vm.run();
-                        Disconnect();
                         retVal = "success finished.";
                     }
                     case "poweroff": {
@@ -111,7 +107,6 @@ public class VCManager {
                         vm.setVmName(vmName);
                         vm.setOperation("poweroff");
                         vm.run();
-                        Disconnect();
                         retVal = "success finished.";
                     }
                     case "reboot": {
@@ -119,7 +114,6 @@ public class VCManager {
                         vm.setVmName(vmName);
                         vm.setOperation("reboot");
                         vm.run();
-                        Disconnect();
                         retVal = "success finished.";
                     }
                     default:

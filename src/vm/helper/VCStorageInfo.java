@@ -34,10 +34,9 @@ public class VCStorageInfo extends VCTaskBase {
 	}
 
 	public static String run() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg, KeyManagementException, NoSuchAlgorithmException, InvalidLoginFaultMsg, InvalidLocaleFaultMsg {
-		if (!VCClientSession.IsConnected()) {
-			VCClientSession.Connect();
-		}
 		init();
-		return getInfo();
+		String retVal = getInfo();
+		VCClientSession.Disconnect();
+		return retVal;
 	}
 }

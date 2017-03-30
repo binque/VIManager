@@ -47,15 +47,14 @@ public class VCLicensesInfo extends VCTaskBase {
     }
 
     public static String run() throws RuntimeFaultFaultMsg, LicenseEntityNotFoundFaultMsg, InvalidPropertyFaultMsg, KeyManagementException, NoSuchAlgorithmException, InvalidLoginFaultMsg, InvalidLocaleFaultMsg {
-        if (!VCClientSession.IsConnected()) {
-            VCClientSession.Connect();
-        }
         init();
         if (serviceContent != null) {
             licManagerRef = serviceContent.getLicenseManager();
         }
         initLicAssignmentManagerRef();
         initLicenseAssignmentManagerLicenseAssignments();
-        return getInfo();
+        String retVal = getInfo();
+        VCClientSession.Disconnect();
+        return retVal;
     }
 }

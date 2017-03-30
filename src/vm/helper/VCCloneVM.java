@@ -18,8 +18,6 @@ public class VCCloneVM extends VCTaskBase {
      * @功能描述 从现有的虚拟机创建出一个模板，并且创建这个模板的多个克隆实例到目标datacenter中
      */
     private static void CloneVM(String datacenterName, String vmPathName, String cloneName, String adminID) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg, NoSuchMethodException, IllegalAccessException, InvocationTargetException, TaskInProgressFaultMsg, InvalidDatastoreFaultMsg, InsufficientResourcesFaultFaultMsg, FileFaultFaultMsg, VmConfigFaultFaultMsg, InvalidStateFaultMsg, MigrationFaultFaultMsg, CustomizationFaultFaultMsg, InvalidCollectorVersionFaultMsg, InvalidLoginFaultMsg, NoSuchAlgorithmException, InvalidLocaleFaultMsg, KeyManagementException {
-        init();
-
         // 找到数据中心的对象引用
         ManagedObjectReference datacenterRef = vimPort.findByInventoryPath(serviceContent.getSearchIndex(), datacenterName);
         if (datacenterRef == null) {
@@ -66,10 +64,8 @@ public class VCCloneVM extends VCTaskBase {
     }
 
     public static void run(String datacenterName, String vmPathName, String cloneName, String adminID) throws InvalidLoginFaultMsg, NoSuchAlgorithmException, RuntimeFaultFaultMsg, InvalidLocaleFaultMsg, KeyManagementException, InsufficientResourcesFaultFaultMsg, InvocationTargetException, NoSuchMethodException, TaskInProgressFaultMsg, InvalidStateFaultMsg, IllegalAccessException, CustomizationFaultFaultMsg, FileFaultFaultMsg, MigrationFaultFaultMsg, InvalidPropertyFaultMsg, InvalidDatastoreFaultMsg, VmConfigFaultFaultMsg, InvalidCollectorVersionFaultMsg {
-        if (!VCClientSession.IsConnected()) {
-            VCClientSession.Connect();
-        }
-
+        init();
         CloneVM(datacenterName, vmPathName, cloneName, adminID);
+        VCClientSession.Disconnect();
     }
 }

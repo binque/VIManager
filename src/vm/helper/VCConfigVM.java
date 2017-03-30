@@ -19,10 +19,6 @@ public class VCConfigVM extends VCTaskBase {
                            final String value, final String diskSize, final String diskmode) throws InvalidLoginFaultMsg, NoSuchAlgorithmException, RuntimeFaultFaultMsg, InvalidLocaleFaultMsg, KeyManagementException, InvalidPropertyFaultMsg, InsufficientResourcesFaultFaultMsg, DuplicateNameFaultMsg, TaskInProgressFaultMsg, InvalidStateFaultMsg, ConcurrentAccessFaultMsg, FileFaultFaultMsg, InvalidCollectorVersionFaultMsg, InvalidDatastoreFaultMsg, VmConfigFaultFaultMsg, InvalidNameFaultMsg {
         // 检查参数类型
         if (customValidation(operation, device, value, diskSize, diskmode)) {
-            if (!VCClientSession.IsConnected()) {
-                VCClientSession.Connect();
-            }
-
             init();
 
             ManagedObjectReference virtualmachien = VCHelper.vmByVmname(vmName, serviceContent.getPropertyCollector());
@@ -32,6 +28,8 @@ public class VCConfigVM extends VCTaskBase {
             } else {
                 logger.error(String.format("Virtual Machine named [ %s ] not found.", vmName));
             }
+
+            VCClientSession.Disconnect();
         }
     }
 

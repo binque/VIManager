@@ -2,6 +2,7 @@ package vm.helper;
 
 /*
  * Created by huxia on 2017/3/13.
+ * Completed By Huxiao
  */
 
 import com.vmware.vim25.*;
@@ -24,6 +25,9 @@ import java.util.Map;
  * @功能描述 客户程序的登陆、登出和认证
  */
 public class VCClientSession {
+    // 记录所有连接的数目，只有当登录的所有方法全部结束时才断开连接
+    // private static int logCounter = 0;
+
     private static Logger logger = Logger.getLogger(VCClientSession.class);
 
     private static final String url = "https://10.251.0.20:8000/sdk";
@@ -34,27 +38,44 @@ public class VCClientSession {
     private static VimService vimService;
 
     public static VimService getVimService() {
+        if (!isConnected) {
+            try {
+                Connect();
+            } catch (RuntimeFaultFaultMsg | NoSuchAlgorithmException | KeyManagementException | InvalidLocaleFaultMsg | InvalidLoginFaultMsg runtimeFaultFaultMsg) {
+                runtimeFaultFaultMsg.printStackTrace();
+            }
+        }
         return vimService;
     }
 
     private static VimPortType vimPort;
 
     static VimPortType getVimPort() {
+        if (!isConnected) {
+            try {
+                Connect();
+            } catch (RuntimeFaultFaultMsg | NoSuchAlgorithmException | KeyManagementException | InvalidLocaleFaultMsg | InvalidLoginFaultMsg runtimeFaultFaultMsg) {
+                runtimeFaultFaultMsg.printStackTrace();
+            }
+        }
         return vimPort;
     }
 
     private static ServiceContent serviceContent;
 
     static ServiceContent getServiceContent() {
+        if (!isConnected) {
+            try {
+                Connect();
+            } catch (RuntimeFaultFaultMsg | NoSuchAlgorithmException | KeyManagementException | InvalidLocaleFaultMsg | InvalidLoginFaultMsg runtimeFaultFaultMsg) {
+                runtimeFaultFaultMsg.printStackTrace();
+            }
+        }
         return serviceContent;
     }
 
     private static final String SVC_INST_NAME = "ServiceInstance";
     private static boolean isConnected = false;
-
-    static boolean IsConnected() {
-        return isConnected;
-    }
 
     private static ManagedObjectReference perfManager;
 
@@ -107,40 +128,48 @@ public class VCClientSession {
      * @功能描述 连接认证
      */
     public static void Connect() throws RuntimeFaultFaultMsg, InvalidLoginFaultMsg, InvalidLocaleFaultMsg, KeyManagementException, NoSuchAlgorithmException {
-        HostnameVerifier hv = (s, sslSession) -> true;
-        trustAllHttpsCertificates();
+        //if(logCounter <= 0) {
+        //    logCounter = 0;
+        //}
+        //logCounter++;
+        if (!isConnected) {
+            HostnameVerifier hv = (s, sslSession) -> true;
+            trustAllHttpsCertificates();
 
-        HttpsURLConnection.setDefaultHostnameVerifier(hv);
+            HttpsURLConnection.setDefaultHostnameVerifier(hv);
 
-        SVC_INST_REF.setType(SVC_INST_NAME);
-        SVC_INST_REF.setValue(SVC_INST_NAME);
+            SVC_INST_REF.setType(SVC_INST_NAME);
+            SVC_INST_REF.setValue(SVC_INST_NAME);
 
-        vimService = new VimService();
-        vimPort = vimService.getVimPort();
-        Map<String, Object> ctxt = ((BindingProvider) vimPort).getRequestContext();
+            vimService = new VimService();
+            vimPort = vimService.getVimPort();
+            Map<String, Object> ctxt = ((BindingProvider) vimPort).getRequestContext();
 
-        ctxt.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
-        ctxt.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
+            ctxt.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
+            ctxt.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
 
-        serviceContent = vimPort.retrieveServiceContent(SVC_INST_REF);
-        vimPort.login(serviceContent.getSessionManager(), username, password, null);
-        isConnected = true;
+            serviceContent = vimPort.retrieveServiceContent(SVC_INST_REF);
+            vimPort.login(serviceContent.getSessionManager(), username, password, null);
+            isConnected = true;
 
-        perfManager = serviceContent.getPerfManager();
-        propCollectorRef = serviceContent.getPropertyCollector();
+            perfManager = serviceContent.getPerfManager();
+            propCollectorRef = serviceContent.getPropertyCollector();
 
-        logger.info(serviceContent.getAbout().getFullName());
-        logger.info("Server type is " + serviceContent.getAbout().getApiType());
+            logger.info(serviceContent.getAbout().getFullName());
+            logger.info("Server type is " + serviceContent.getAbout().getApiType());
+        }
     }
 
     /**
      * @功能描述 断开连接
      */
     public static void Disconnect() throws RuntimeFaultFaultMsg {
+        //logCounter--;
         if (isConnected) {
             vimPort.logout(serviceContent.getSessionManager());
+            isConnected = false;
+            //logCounter = 0;
         }
-        isConnected = false;
     }
 
     /**
