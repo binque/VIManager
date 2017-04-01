@@ -4,12 +4,10 @@ import com.vmware.vim25.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 public class VCStorageInfo extends VCTaskBase {
-	private static String getInfo() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+	private static String getStorageInfo() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
 		long capability;//单位是b
 		long freeSpace;//单位是b
 		JSONArray JsonStorage = new JSONArray();
@@ -33,10 +31,15 @@ public class VCStorageInfo extends VCTaskBase {
 		return JsonStorage.toString();
 	}
 
-	public static String run() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg, KeyManagementException, NoSuchAlgorithmException, InvalidLoginFaultMsg, InvalidLocaleFaultMsg {
-		init();
-		String retVal = getInfo();
-		VCClientSession.Disconnect();
-		return retVal;
+	public static String run() throws Exception {
+		try {
+			init();
+			return getStorageInfo();
+		} catch (Throwable e) {
+			e.printStackTrace();
+			throw new Exception(e.getMessage());
+		} finally {
+			VCClientSession.Disconnect();
+		}
 	}
 }

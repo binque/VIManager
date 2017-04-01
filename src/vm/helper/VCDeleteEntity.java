@@ -25,12 +25,17 @@ public class VCDeleteEntity extends VCTaskBase {
                         + " and Entity Type - [ %s ]%n", entityName, moref.getType()));
             }
         }
-        VCClientSession.Disconnect();
     }
 
-    public static void run(String vmyname) throws InvalidLoginFaultMsg, NoSuchAlgorithmException, RuntimeFaultFaultMsg, InvalidLocaleFaultMsg, KeyManagementException, InvalidCollectorVersionFaultMsg, InvalidPropertyFaultMsg, VimFaultFaultMsg {
-        init();
-
-        deleteManagedObject(vmyname);
+    public static void run(String vmyname) throws Exception {
+        try {
+            init();
+            deleteManagedObject(vmyname);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        } finally {
+            VCClientSession.Disconnect();
+        }
     }
 }

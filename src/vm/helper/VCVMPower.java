@@ -1,10 +1,12 @@
 package vm.helper;
 
-import com.vmware.vim25.*;
+import com.vmware.vim25.InvalidPropertyFaultMsg;
+import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.RuntimeFaultFaultMsg;
 
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -291,12 +293,20 @@ public class VCVMPower extends VCTaskBase {
 		}
 	}
 
-	public void run() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg, InvalidLoginFaultMsg, NoSuchAlgorithmException, InvalidLocaleFaultMsg, KeyManagementException {
+	public void run() throws Exception {
 		validate();
 		if (checkOptions()) {
-			init();
-			runOperation();
-			VCClientSession.Disconnect();
+			try {
+				init();
+				runOperation();
+			} catch (Throwable e) {
+				e.printStackTrace();
+				throw new Exception(e.getMessage());
+			} finally {
+				VCClientSession.Disconnect();
+			}
+		} else {
+			logger.error("Options Checked Wrong.");
 		}
 	}
 

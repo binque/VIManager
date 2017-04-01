@@ -75,20 +75,23 @@ class VCHelper {
      */
     static Map<ManagedObjectReference, Map<String, Object>> inContainerByType(ManagedObjectReference container, String morefType,
                                                                               String[] morefProperties, RetrieveOptions retrieveOptions) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
-        List<ObjectContent> listcont = containerViewByType(container, morefType, retrieveOptions, morefProperties).getObjects();
+        Map<ManagedObjectReference, Map<String, Object>> tgetMoref = null;
+        RetrieveResult retrieveResult = containerViewByType(container, morefType, retrieveOptions, morefProperties);
+        if (retrieveResult != null) {
+            List<ObjectContent> listcont = retrieveResult.getObjects();
+            tgetMoref = new HashMap<>();
 
-        Map<ManagedObjectReference, Map<String, Object>> tgetMoref = new HashMap<>();
-
-        if (listcont != null) {
-            for (ObjectContent objectContent : listcont) {
-                Map<String, Object> propMap = new HashMap<>();
-                List<DynamicProperty> listdps = objectContent.getPropSet();
-                if (listdps != null) {
-                    for (DynamicProperty dynamicProperty : listdps) {
-                        propMap.put(dynamicProperty.getName(), dynamicProperty.getVal());
+            if (listcont != null) {
+                for (ObjectContent objectContent : listcont) {
+                    Map<String, Object> propMap = new HashMap<>();
+                    List<DynamicProperty> listdps = objectContent.getPropSet();
+                    if (listdps != null) {
+                        for (DynamicProperty dynamicProperty : listdps) {
+                            propMap.put(dynamicProperty.getName(), dynamicProperty.getVal());
+                        }
                     }
+                    tgetMoref.put(objectContent.getObj(), propMap);
                 }
-                tgetMoref.put(objectContent.getObj(), propMap);
             }
         }
         return tgetMoref;

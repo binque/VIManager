@@ -4,8 +4,6 @@ import com.vmware.vim25.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public class VCLicensesInfo extends VCTaskBase {
@@ -46,15 +44,21 @@ public class VCLicensesInfo extends VCTaskBase {
         return JsonInfo.toString();
     }
 
-    public static String run() throws RuntimeFaultFaultMsg, LicenseEntityNotFoundFaultMsg, InvalidPropertyFaultMsg, KeyManagementException, NoSuchAlgorithmException, InvalidLoginFaultMsg, InvalidLocaleFaultMsg {
-        init();
-        if (serviceContent != null) {
-            licManagerRef = serviceContent.getLicenseManager();
+    public static String run() throws Exception {
+        try {
+            init();
+            if (serviceContent != null) {
+                licManagerRef = serviceContent.getLicenseManager();
+            }
+            initLicAssignmentManagerRef();
+            initLicenseAssignmentManagerLicenseAssignments();
+            return getInfo();
+        }catch (Throwable e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        } finally {
+            VCClientSession.Disconnect();
         }
-        initLicAssignmentManagerRef();
-        initLicenseAssignmentManagerLicenseAssignments();
-        String retVal = getInfo();
-        VCClientSession.Disconnect();
-        return retVal;
+
     }
 }

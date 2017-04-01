@@ -1,6 +1,8 @@
 package vm.manager;
 
-import vm.helper.*;
+import vm.helper.VCClientSession;
+import vm.helper.VCConfigVM;
+import vm.helper.VCGetVMList;
 
 /*
  * Created by huxia on 2017/3/13.
@@ -19,9 +21,11 @@ public class ClientTest {
             // 重新配置被管实体的测试代码
             // VCConfigVM.run("CloneTest", "update", "memory", "normal", "", "");
 
+            //VCCloneVM.run("Datacenter", "Datacenter/vm/ServiceTest", "CloneTest44", null, "1", "1024", "4096", "persistent");
+            VCConfigVM.run("ServiceTest", "2", "1024", null, null, null);
             // 获取虚拟机名称列表
-            //String vmList = VCGetVMList.run("Datacenter", null);
-            //System.out.println(vmList);
+            String vmList = VCGetVMList.run("Datacenter", null);
+            System.out.println(vmList);
 
             // 获取主机信息
             //String hostInfo = VCHostInfo.run();
@@ -32,8 +36,8 @@ public class ClientTest {
             //System.out.println(licenseInfo);
 
             // 获取存储信息
-            String storageInfo = VCStorageInfo.run();
-            System.out.println(storageInfo);
+            //String storageInfo = VCStorageInfo.run();
+            //System.out.println(storageInfo);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());

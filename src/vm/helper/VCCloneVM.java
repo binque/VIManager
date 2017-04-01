@@ -2,10 +2,6 @@ package vm.helper;
 
 import com.vmware.vim25.*;
 
-import java.lang.reflect.InvocationTargetException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-
 /**
  * Created by huxia on 2017/3/14.
  * 完成于当天晚上 BY 胡箫
@@ -15,9 +11,10 @@ public class VCCloneVM extends VCTaskBase {
      * @param datacenterName datacenter的名字
      * @param vmPathName     虚拟机的清单路径
      * @param cloneName      克隆出虚拟机的名称
+     * @param adminID 虚拟机管理员名称，该信息储存在Annotation中
      * @功能描述 从现有的虚拟机创建出一个模板，并且创建这个模板的多个克隆实例到目标datacenter中
      */
-    private static void CloneVM(String datacenterName, String vmPathName, String cloneName, String adminID) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg, NoSuchMethodException, IllegalAccessException, InvocationTargetException, TaskInProgressFaultMsg, InvalidDatastoreFaultMsg, InsufficientResourcesFaultFaultMsg, FileFaultFaultMsg, VmConfigFaultFaultMsg, InvalidStateFaultMsg, MigrationFaultFaultMsg, CustomizationFaultFaultMsg, InvalidCollectorVersionFaultMsg, InvalidLoginFaultMsg, NoSuchAlgorithmException, InvalidLocaleFaultMsg, KeyManagementException {
+    private static void CloneVM(String datacenterName, String vmPathName, String cloneName, String adminID) throws Exception {
         // 找到数据中心的对象引用
         ManagedObjectReference datacenterRef = vimPort.findByInventoryPath(serviceContent.getSearchIndex(), datacenterName);
         if (datacenterRef == null) {
@@ -63,9 +60,15 @@ public class VCCloneVM extends VCTaskBase {
         }
     }
 
-    public static void run(String datacenterName, String vmPathName, String cloneName, String adminID) throws InvalidLoginFaultMsg, NoSuchAlgorithmException, RuntimeFaultFaultMsg, InvalidLocaleFaultMsg, KeyManagementException, InsufficientResourcesFaultFaultMsg, InvocationTargetException, NoSuchMethodException, TaskInProgressFaultMsg, InvalidStateFaultMsg, IllegalAccessException, CustomizationFaultFaultMsg, FileFaultFaultMsg, MigrationFaultFaultMsg, InvalidPropertyFaultMsg, InvalidDatastoreFaultMsg, VmConfigFaultFaultMsg, InvalidCollectorVersionFaultMsg {
-        init();
-        CloneVM(datacenterName, vmPathName, cloneName, adminID);
-        VCClientSession.Disconnect();
+    public static void run(String datacenterName, String vmPathName, String cloneName, String adminID, String cpuNum, String memoryMb, String diskSizeMb, String diskMode) throws Exception {
+        try {
+            init();
+            CloneVM(datacenterName, vmPathName, cloneName, adminID);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        } finally {
+            VCClientSession.Disconnect();
+        }
     }
 }

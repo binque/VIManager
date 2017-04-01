@@ -4,8 +4,6 @@ import com.vmware.vim25.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 /*
@@ -15,15 +13,15 @@ import java.util.Map;
 public class VCHostInfo extends VCTaskBase {
 
 	//获取主机的cpu、mem的信息通过HostListSummary类
-	private static String getInfo() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+	private static String getHostInfo() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
 
 		JSONArray JsonHostInfo = new JSONArray();
 
 		String[] infoName = {"summary"};
 		ManagedObjectReference container = serviceContent.getRootFolder();
 		Map<ManagedObjectReference, Map<String, Object>> hostMap = VCHelper.inContainerByType(container, "HostSystem", infoName, new RetrieveOptions());
-		for (Map<String, Object> m : hostMap.values()) {
-
+		for (ManagedObjectReference host : hostMap.keySet()) {
+			Map<String, Object> m = hostMap.get(host);
 			//cpu 单位为Mhz 可能需要更改为Ghz
 			int cpuTotalSize;
 			int cpuUsedSize = -1;
@@ -44,6 +42,13 @@ public class VCHostInfo extends VCTaskBase {
 				memUsedSize = quickStates.getOverallMemoryUsage();
 			}
 
+			String[] vmProp = { "name" };
+			Map<ManagedObjectReference, Map<String, Object>> vmlist = VCHelper.inContainerByType(host, "VirtualMachine", vmProp, new RetrieveOptions());
+			JSONArray Jsonvmlist = new JSONArray();
+			for (Map<String, Object> val : vmlist.values()) {
+				Jsonvmlist.add(val.get(vmProp[0]));
+			}
+
 			JSONObject jo = new JSONObject();
 			jo.put("Host Name", hostSummary.getConfig().getName());
 			jo.put("Is Connected", hostSummary.getRuntime().getConnectionState().value());
@@ -52,6 +57,7 @@ public class VCHostInfo extends VCTaskBase {
 			jo.put("CPU Used By Mhz", cpuUsedSize);
 			jo.put("Memory Size By B", memTotalSize);
 			jo.put("Memory Used By Mb", memUsedSize);
+			jo.put("Virtual Machine List", Jsonvmlist);
 
 			JsonHostInfo.add(jo);
 
@@ -65,10 +71,16 @@ public class VCHostInfo extends VCTaskBase {
 		return JsonHostInfo.toString();
 	}
 
-	public static String run() throws KeyManagementException, NoSuchAlgorithmException, RuntimeFaultFaultMsg, InvalidLoginFaultMsg, InvalidLocaleFaultMsg, InvalidPropertyFaultMsg {
-		init();
-		String retVal = getInfo();
-		VCClientSession.Disconnect();
-		return retVal;
+	public static String run() throws Exception {
+		try {
+			init();
+			return getHostInfo();
+		} catch (Throwable e) {
+			e.printStackTrace();
+			throw new Exception(e.getMessage());
+		} finally {
+			VCClientSession.Disconnect();
+		}
+
 	}
 }

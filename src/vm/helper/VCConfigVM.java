@@ -2,8 +2,6 @@ package vm.helper;
 
 import com.vmware.vim25.*;
 
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,61 +13,94 @@ import java.util.Map;
  */
 public class VCConfigVM extends VCTaskBase {
 
-    public static void run(final String vmName, final String operation, final String device,
-                           final String value, final String diskSize, final String diskmode) throws InvalidLoginFaultMsg, NoSuchAlgorithmException, RuntimeFaultFaultMsg, InvalidLocaleFaultMsg, KeyManagementException, InvalidPropertyFaultMsg, InsufficientResourcesFaultFaultMsg, DuplicateNameFaultMsg, TaskInProgressFaultMsg, InvalidStateFaultMsg, ConcurrentAccessFaultMsg, FileFaultFaultMsg, InvalidCollectorVersionFaultMsg, InvalidDatastoreFaultMsg, VmConfigFaultFaultMsg, InvalidNameFaultMsg {
-        // 检查参数类型
-        if (customValidation(operation, device, value, diskSize, diskmode)) {
+    public static void run(String vmName, String CPU, String memory, String diskname, String disksize, String diskmode) throws Exception {
+        try {
             init();
+            ManagedObjectReference virtualmachine = VCHelper.vmByVmname(vmName, serviceContent.getPropertyCollector());
 
-            ManagedObjectReference virtualmachien = VCHelper.vmByVmname(vmName, serviceContent.getPropertyCollector());
-
-            if (virtualmachien != null) {
-                reConfig(virtualmachien, vmName, operation, device, value, diskSize, diskmode);
+            if (virtualmachine != null) {
+                reConfig(virtualmachine, vmName, CPU, memory, diskname, disksize, diskmode);
             } else {
                 logger.error(String.format("Virtual Machine named [ %s ] not found.", vmName));
             }
-
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        } finally {
             VCClientSession.Disconnect();
         }
     }
 
     /**
-     * @param vmName     虚拟机名称
-     * @param operation  操作名称，可以是 add/remove/update 三者之一
-     * @param deviceType 所要操作的设备名称，可以使 disk/nic/cd/cpu/memory 五者之一
-     * @param value      所要修改的目标值，根据具体情况确定
-     * @param diskSize   磁盘大小
-     * @param diskmode   磁盘模式
+     * @param virtualMachine 虚拟机MOR
+     * @param vmName 虚拟机名称
+     * @param CPU   给虚拟机分配的cpu核心数目，可以是一个数字或者low(1)/normal(2)/high(4)
+     * @param memory   给虚拟机分配的内存大小，可以是一个数字或者low(1024)/normal(2048)/high(4096)
+     * @param diskName 给虚拟机增加或者移除的磁盘名称 虚拟磁盘模式(diskmode)、虚拟磁盘大小(disksize)
+     * @param diskSize 磁盘大小，如果指定了磁盘大小，则增加磁盘，如果未指定磁盘大小，则移除磁盘
+     * @param diskMode 磁盘模式，可选 persistent/independent_persistent/independent_nonpersistent/nonpersistent/undoable/append
      * @功能描述 重新配置虚拟机
      */
-    private static void reConfig(ManagedObjectReference virtualMachine, String vmName, String operation, String deviceType, String value, String diskSize, String diskmode) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg, InvalidCollectorVersionFaultMsg, InvalidStateFaultMsg, InsufficientResourcesFaultFaultMsg, InvalidDatastoreFaultMsg, TaskInProgressFaultMsg, DuplicateNameFaultMsg, FileFaultFaultMsg, InvalidNameFaultMsg, ConcurrentAccessFaultMsg, VmConfigFaultFaultMsg {
+    private static void reConfig(ManagedObjectReference virtualMachine, String vmName, String CPU, String memory, String diskName, String diskSize, String diskMode) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg, InvalidCollectorVersionFaultMsg, InvalidStateFaultMsg, InsufficientResourcesFaultFaultMsg, InvalidDatastoreFaultMsg, TaskInProgressFaultMsg, DuplicateNameFaultMsg, FileFaultFaultMsg, InvalidNameFaultMsg, ConcurrentAccessFaultMsg, VmConfigFaultFaultMsg {
         VirtualMachineConfigSpec virtualMachineConfigSpec = new VirtualMachineConfigSpec();
-
-        if (deviceType.equalsIgnoreCase("memory") && operation.equalsIgnoreCase("update")) {
-            logger.info(String.format("Reconfiguring The Virtual Machine [ %s ] For Memory Update", vmName));
+        if (memory != null && !memory.isEmpty()) {
+            logger.info(String.format("Reconfiguring The Virtual Machine [ %s ] For Memory Update By Value [ %s ]", vmName, memory));
             try {
-                virtualMachineConfigSpec.setMemoryAllocation(getShares(value));
+                virtualMachineConfigSpec.setMemoryAllocation(getShares(memory));
+                long memoryMB;
+                if (memory.equalsIgnoreCase("high")) {
+                    memoryMB = 4098;
+                } else if (memory.equalsIgnoreCase("normal")) {
+                    memoryMB = 2048;
+                } else if (memory.equalsIgnoreCase("low")) {
+                    memoryMB = 1024;
+                } else {
+                    memoryMB = Integer.parseInt(memory);
+                }
+                virtualMachineConfigSpec.setMemoryMB(memoryMB);
             } catch (NumberFormatException e) {
                 logger.error("Value of Memory update must be one of high|low|normal|[numeric value]");
                 return;
             }
-        } else if (deviceType.equalsIgnoreCase("cpu") && !operation.equalsIgnoreCase("update")) {
-            logger.info(String.format("Reconfiguring The Virtual Machine [ %s ] For CPU Update", vmName));
+        }
+        if (CPU != null && !CPU.isEmpty()) {
+            logger.info(String.format("Reconfiguring The Virtual Machine [ %s ] For CPU Update By Value [ %s ]", vmName, CPU));
             try {
-                virtualMachineConfigSpec.setCpuAllocation(getShares(value));
+                virtualMachineConfigSpec.setCpuAllocation(getShares(CPU));
+                int numCpu;
+                if (CPU.equalsIgnoreCase("high")) {
+                    numCpu = 4;
+                } else if (CPU.equalsIgnoreCase("normal")) {
+                    numCpu = 2;
+                } else if (CPU.equalsIgnoreCase("low")) {
+                    numCpu = 1;
+                } else {
+                    numCpu = Integer.parseInt(CPU);
+                }
+                virtualMachineConfigSpec.setNumCPUs(numCpu);
             } catch (NumberFormatException e) {
                 logger.error("Value of CPU update must be one of high|low|normal|[numeric value]");
                 return;
             }
-        } else if (deviceType.equalsIgnoreCase("disk") && !operation.equalsIgnoreCase("update")) {
-            logger.info(String.format("Reconfiguring The Virtual Machine [ %s ] For Disk Update", vmName));
-            VirtualDeviceConfigSpec virtualDeviceConfigSpec = getDiskDeviceConfigSpec(virtualMachine, vmName, operation, value, diskSize, diskmode);
+        }
+        if (diskName != null && !diskName.isEmpty()) {
+            logger.info(String.format("Reconfiguring The Virtual Machine [ %s ] For Disk Update By Name [ %s ]、 Size [ %s ]、 Mode [ %s ]", vmName, diskName, diskSize, diskMode));
+            VirtualDeviceConfigSpec virtualDeviceConfigSpec;
+            if (diskSize != null && !diskSize.isEmpty()) {
+                if (diskMode == null || diskMode.isEmpty()) {
+                    diskMode = "persistent";
+                }
+                virtualDeviceConfigSpec = getDiskDeviceConfigSpec(virtualMachine, vmName, "add", diskName, diskSize, diskMode);
+            } else {
+                virtualDeviceConfigSpec = getDiskDeviceConfigSpec(virtualMachine, vmName, "remove", diskName, diskSize, diskMode);
+            }
             if (virtualDeviceConfigSpec != null) {
                 virtualMachineConfigSpec.getDeviceChange().add(virtualDeviceConfigSpec);
             } else {
+                logger.error("Cannot Get Virtual Disk Config Spec.");
                 return;
             }
-        } else if (deviceType.equalsIgnoreCase("nic") && !operation.equalsIgnoreCase("update")) {
+        } /*else if (deviceType.equalsIgnoreCase("nic") && !operation.equalsIgnoreCase("update")) {
             logger.info(String.format("Reconfiguring The Virtual Machine [ %s ] For NIC Update", vmName));
             VirtualDeviceConfigSpec virtualDeviceConfigSpec = getNICDeviceConfigSpec(virtualMachine, operation, value);
             if (virtualDeviceConfigSpec != null) {
@@ -86,16 +117,96 @@ public class VCConfigVM extends VCTaskBase {
                 return;
             }
         } else {
-            logger.error("Invalid device type [ memory | cpu | disk | nic | cd ]");
+            logger.error("Invalid device type [ memory | cpu | disk | nic | cd ] is :" + deviceType);
             return;
         }
-
+*/
         ManagedObjectReference tmor = vimPort.reconfigVMTask(virtualMachine, virtualMachineConfigSpec);
         if (getTaskResultAfterDone(tmor)) {
             logger.info("Virtual Machine reconfigured successfully");
         } else {
             logger.error("Virtual Machine reconfigur failed");
         }
+    }
+
+    private static ResourceAllocationInfo getShares(String value) {
+        ResourceAllocationInfo raInfo = new ResourceAllocationInfo();
+        SharesInfo sharesInfo = new SharesInfo();
+        if (value.equalsIgnoreCase(SharesLevel.HIGH.toString())) {
+            sharesInfo.setLevel(SharesLevel.HIGH);
+        } else if (value.equalsIgnoreCase(SharesLevel.NORMAL.toString())) {
+            sharesInfo.setLevel(SharesLevel.NORMAL);
+        } else if (value.equalsIgnoreCase(SharesLevel.LOW.toString())) {
+            sharesInfo.setLevel(SharesLevel.LOW);
+        } else {
+            sharesInfo.setLevel(SharesLevel.CUSTOM);
+            sharesInfo.setShares(Integer.parseInt(value));
+        }
+        raInfo.setShares(sharesInfo);
+        return raInfo;
+    }
+
+    /**
+     * @param virtualMachine 虚拟机的MOR
+     * @param vmName         虚拟机名称
+     * @param operation      操作名称，对于磁盘可以是 add/remove 两者之一
+     * @param value          磁盘名称，要增加的或者要移除的磁盘名称，无需后缀名
+     * @param disksize       磁盘大小，单位为MB
+     * @param diskmode       磁盘模式
+     * @return 返回磁盘设备配置SPEC
+     */
+    private static VirtualDeviceConfigSpec getDiskDeviceConfigSpec(ManagedObjectReference virtualMachine, String vmName, String operation, String value, String disksize, String diskmode)
+            throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+        VirtualDeviceConfigSpec diskSpec = new VirtualDeviceConfigSpec();
+
+        if (operation.equalsIgnoreCase("Add")) {
+            VirtualDisk disk = new VirtualDisk();
+            VirtualDiskFlatVer2BackingInfo diskfileBacking = new VirtualDiskFlatVer2BackingInfo();
+            DatastoreSummary dsSummary = getDatastoreNameWithFreeSpace(virtualMachine, Integer.parseInt(disksize));
+            String dsName = dsSummary.getName();
+
+            int ckey = 0;
+            int unitNumber = 0;
+            List<Integer> getControllerKeyReturnArr = getControllerKey(virtualMachine);
+            if (!getControllerKeyReturnArr.isEmpty()) {
+                ckey = getControllerKeyReturnArr.get(0);
+                unitNumber = getControllerKeyReturnArr.get(1);
+            }
+            String fileName = "[" + dsName + "] " + vmName + "/" + value + ".vmdk";
+            diskfileBacking.setFileName(fileName);
+            diskfileBacking.setDiskMode(diskmode);
+
+            disk.setControllerKey(ckey);
+            disk.setUnitNumber(unitNumber);
+            disk.setBacking(diskfileBacking);
+            int size = 1024 * (Integer.parseInt(disksize));
+            disk.setCapacityInKB(size);
+            disk.setKey(-1);
+
+            diskSpec.setOperation(VirtualDeviceConfigSpecOperation.ADD);
+            diskSpec.setFileOperation(VirtualDeviceConfigSpecFileOperation.CREATE);
+            diskSpec.setDevice(disk);
+        } else if (operation.equalsIgnoreCase("Remove")) {
+            VirtualDisk disk = null;
+            List<VirtualDevice> deviceList = ((ArrayOfVirtualDevice) VCHelper.entityProps(virtualMachine, new String[]{"config.hardware.device"}).get("config.hardware.device")).getVirtualDevice();
+            for (VirtualDevice device : deviceList) {
+                if (device instanceof VirtualDisk) {
+                    if (value.equalsIgnoreCase(device.getDeviceInfo().getLabel())) {
+                        disk = (VirtualDisk) device;
+                        break;
+                    }
+                }
+            }
+            if (disk != null) {
+                diskSpec.setOperation(VirtualDeviceConfigSpecOperation.REMOVE);
+                diskSpec.setFileOperation(VirtualDeviceConfigSpecFileOperation.DESTROY);
+                diskSpec.setDevice(disk);
+            } else {
+                logger.error("No device found " + value);
+                return null;
+            }
+        }
+        return diskSpec;
     }
 
     /**
@@ -145,101 +256,6 @@ public class VCConfigVM extends VCTaskBase {
                             + "capacity. Please add an additional SCSI controller");
         }
         return retVal;
-    }
-
-    private static ResourceAllocationInfo getShares(String value) {
-        ResourceAllocationInfo raInfo = new ResourceAllocationInfo();
-        SharesInfo sharesInfo = new SharesInfo();
-        if (value.equalsIgnoreCase(SharesLevel.HIGH.toString())) {
-            sharesInfo.setLevel(SharesLevel.HIGH);
-        } else if (value.equalsIgnoreCase(SharesLevel.NORMAL.toString())) {
-            sharesInfo.setLevel(SharesLevel.NORMAL);
-        } else if (value.equalsIgnoreCase(SharesLevel.LOW.toString())) {
-            sharesInfo.setLevel(SharesLevel.LOW);
-        } else {
-            sharesInfo.setLevel(SharesLevel.CUSTOM);
-            sharesInfo.setShares(Integer.parseInt(value));
-        }
-        raInfo.setShares(sharesInfo);
-        return raInfo;
-    }
-
-    private static String getDatastoreNameWithFreeSpace(ManagedObjectReference virtualMachine, int minFreeSpace)
-            throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
-        String dsName = null;
-        List<ManagedObjectReference> datastores = ((ArrayOfManagedObjectReference) VCHelper.entityProps(virtualMachine, new String[]{"datastore"}).get("datastore")).getManagedObjectReference();
-        for (ManagedObjectReference datastore : datastores) {
-            DatastoreSummary ds = (DatastoreSummary) VCHelper.entityProps(datastore, new String[]{"summary"}).get("summary");
-            if (ds.getFreeSpace() > minFreeSpace) {
-                dsName = ds.getName();
-                break;
-            }
-        }
-        return dsName;
-    }
-
-    /**
-     * @param virtualMachine 虚拟机的MOR
-     * @param vmName         虚拟机名称
-     * @param operation      操作名称，对于磁盘可以是 add/remove 两者之一
-     * @param value          磁盘名称，要增加的或者要移除的磁盘名称，无需后缀名
-     * @param disksize       磁盘大小，单位为MB
-     * @param diskmode       磁盘模式
-     * @return 返回磁盘设备配置SPEC
-     */
-    private static VirtualDeviceConfigSpec getDiskDeviceConfigSpec(ManagedObjectReference virtualMachine, String vmName, String operation, String value, String disksize, String diskmode)
-            throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
-        VirtualDeviceConfigSpec diskSpec = new VirtualDeviceConfigSpec();
-
-        if (operation.equalsIgnoreCase("Add")) {
-            VirtualDisk disk = new VirtualDisk();
-            VirtualDiskFlatVer2BackingInfo diskfileBacking = new VirtualDiskFlatVer2BackingInfo();
-            String dsName = getDatastoreNameWithFreeSpace(virtualMachine, Integer.parseInt(disksize));
-
-            int ckey = 0;
-            int unitNumber = 0;
-            List<Integer> getControllerKeyReturnArr = getControllerKey(virtualMachine);
-            if (!getControllerKeyReturnArr.isEmpty()) {
-                ckey = getControllerKeyReturnArr.get(0);
-                unitNumber = getControllerKeyReturnArr.get(1);
-            }
-            String fileName = "[" + dsName + "] " + vmName + "/" + value
-                    + ".vmdk";
-            diskfileBacking.setFileName(fileName);
-            diskfileBacking.setDiskMode(diskmode);
-
-            disk.setControllerKey(ckey);
-            disk.setUnitNumber(unitNumber);
-            disk.setBacking(diskfileBacking);
-            int size = 1024 * (Integer.parseInt(disksize));
-            disk.setCapacityInKB(size);
-            disk.setKey(-1);
-
-            diskSpec.setOperation(VirtualDeviceConfigSpecOperation.ADD);
-            diskSpec.setFileOperation(VirtualDeviceConfigSpecFileOperation.CREATE);
-            diskSpec.setDevice(disk);
-        } else if (operation.equalsIgnoreCase("Remove")) {
-            VirtualDisk disk = null;
-            List<VirtualDevice> deviceList = ((ArrayOfVirtualDevice) VCHelper.entityProps(virtualMachine, new String[]{"config.hardware.device"}).get("config.hardware.device")).getVirtualDevice();
-            for (VirtualDevice device : deviceList) {
-                if (device instanceof VirtualDisk) {
-                    if (value.equalsIgnoreCase(device.getDeviceInfo()
-                            .getLabel())) {
-                        disk = (VirtualDisk) device;
-                        break;
-                    }
-                }
-            }
-            if (disk != null) {
-                diskSpec.setOperation(VirtualDeviceConfigSpecOperation.REMOVE);
-                diskSpec.setFileOperation(VirtualDeviceConfigSpecFileOperation.DESTROY);
-                diskSpec.setDevice(disk);
-            } else {
-                logger.error("No device found " + value);
-                return null;
-            }
-        }
-        return diskSpec;
     }
 
     private static VirtualDeviceConfigSpec getCDDeviceConfigSpec(ManagedObjectReference virtualMachine, String operation, String value)

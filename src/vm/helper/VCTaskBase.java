@@ -7,9 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by huxia on 2017/3/19.
@@ -150,5 +148,18 @@ public class VCTaskBase {
             }
         }
         return listobjcont;
+    }
+
+    protected static DatastoreSummary getDatastoreNameWithFreeSpace(ManagedObjectReference virtualMachine, int minFreeSpace)
+            throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+        DatastoreSummary ds = null;
+        List<ManagedObjectReference> datastores = ((ArrayOfManagedObjectReference) VCHelper.entityProps(virtualMachine, new String[]{"datastore"}).get("datastore")).getManagedObjectReference();
+        for (ManagedObjectReference datastore : datastores) {
+            ds = (DatastoreSummary) VCHelper.entityProps(datastore, new String[]{"summary"}).get("summary");
+            if (ds.getFreeSpace() > minFreeSpace) {
+                break;
+            }
+        }
+        return ds;
     }
 }

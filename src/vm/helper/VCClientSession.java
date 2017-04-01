@@ -6,9 +6,8 @@ package vm.helper;
  */
 
 import com.vmware.vim25.*;
-import org.w3c.dom.Element;
-
 import org.apache.log4j.Logger;
+import org.w3c.dom.Element;
 
 import javax.net.ssl.*;
 import javax.xml.ws.BindingProvider;
@@ -155,8 +154,7 @@ public class VCClientSession {
             perfManager = serviceContent.getPerfManager();
             propCollectorRef = serviceContent.getPropertyCollector();
 
-            logger.info(serviceContent.getAbout().getFullName());
-            logger.info("Server type is " + serviceContent.getAbout().getApiType());
+            logger.info("Connected successfully.\n" + serviceContent.getAbout().getFullName() + "\nServer type is " + serviceContent.getAbout().getApiType());
         }
     }
 
@@ -169,6 +167,8 @@ public class VCClientSession {
             vimPort.logout(serviceContent.getSessionManager());
             isConnected = false;
             //logCounter = 0;
+
+            logger.info("Disconnected successfully.");
         }
     }
 

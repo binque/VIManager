@@ -15,26 +15,21 @@ import javax.jws.WebService;
 public class VCManager {
     /**
      * @param vmName   虚拟机的名字
-     * @param CPU      给虚拟机分配的cpu核心数目
-     * @param memory   给虚拟机分配的内存大小
-     * @param Disk     给虚拟机分配的磁盘空间大小
-     * @param NetLimit 网络限制
-     * @return 如果成功则返回null，否则返回表示错误信息的字符串
+     * @param CPU      给虚拟机分配的cpu核心数目，可以是一个数字或者low(1)/normal(2)/high(4)
+     * @param memory   给虚拟机分配的内存大小，可以是一个数字或者low(1024)/normal(2048)/high(4096)
+     * @param diskname 给虚拟机增加或者移除的磁盘名称 虚拟磁盘模式(diskmode)、虚拟磁盘大小(disksize)
+     * @param disksize 磁盘大小，如果指定了磁盘大小，则增加磁盘，如果未指定磁盘大小，则移除磁盘
+     * @param diskmode 磁盘模式，可选persistent/independent_persistent/independent_nonpersistent/nonpersistent/undoable/append
+     * @return 如果成功则返回空字符串，否则返回表示错误信息的字符串
      * @功能描述 编辑虚拟机配置
      */
     @WebMethod
-    public String ChangeConfig(String vmName, String CPU, String memory, String Disk, String NetLimit) {
-        String retVal = "";
-
+    public String ChangeConfig(String vmName, String CPU, String memory, String diskname, String disksize, String diskmode) {
+        String retVal;
         try {
-            if (vmName != null && !vmName.isEmpty() && CPU.equals("low") || CPU.equals("normal") || CPU.equals("high")) {
-                VCConfigVM.run(vmName, "update", "cpu", CPU, "", "");
-            }
-            if (vmName != null && !vmName.isEmpty() && memory.equals("low") || memory.equals("normal") || memory.equals("high")) {
-                VCConfigVM.run(vmName, "update", "memory", memory, "", "");
-            }
+            VCConfigVM.run(vmName, CPU, memory, diskname, disksize, diskmode);
+            retVal = "success finished.";
         } catch (Throwable e) {
-            e.printStackTrace();
             retVal = "error :" + e.getMessage();
         }
         return retVal;
@@ -42,38 +37,41 @@ public class VCManager {
 
     @WebMethod
     /*
-     * @param name 主机名字如10.251.0.16
+     * @功能描述 获取主机信息列表
      */
     public String GetHostInfo() {
         String info;
         try {
             info = VCHostInfo.run();
         } catch (Exception e) {
-            e.printStackTrace();
             info = "error :" + e.getMessage();
         }
         return info;
     }
 
     @WebMethod
+    /*
+     * @功能描述 获取证书信息
+     */
     public String GetLicenseInfo() {
         String info;
         try {
             info = VCLicensesInfo.run();
         } catch (Exception e) {
-            e.printStackTrace();
             info = "error :" + e.getMessage();
         }
         return info;
     }
 
     @WebMethod
+    /*
+     * @功能描述 获取存储信息
+     */
     public String GetStorageInfo() {
         String info;
         try {
             info = VCStorageInfo.run();
         } catch (Exception e) {
-            e.printStackTrace();
             info = "error :" + e.getMessage();
         }
         return info;
@@ -120,7 +118,6 @@ public class VCManager {
                         retVal = "error :parmeter cannot resolved.";
                 }
             } catch (Throwable e) {
-                e.printStackTrace();
                 retVal += "error :" + e.getMessage();
             }
         } else {
@@ -132,22 +129,42 @@ public class VCManager {
     /**
      * @param templateID 模板名称
      * @param vmName     虚拟机名称
+     * @param adminID 虚拟机管理员名称，该信息储存在Annotation中
+     * @param cpuNum 克隆虚拟机的cpu核心数目
+     * @param memoryMb 克隆虚拟机的内存大小
+     * @param diskSizeMb 克隆虚拟机的磁盘大小
+     * @param diskmode 克隆虚拟机的磁盘模式，见配置虚拟机说明
      * @return 如果任务执行完成（不意味着虚拟机创建完成），返回以success开始的字符串；否则返回以error开始，表示错误信息的字符串
      * @功能描述 从模板创建一个虚拟机
      */
     @WebMethod
-    public String CreateFromTemplate(String templateID, String vmName, String adminID) {
+    public String CreateFromTemplate(String templateID, String vmName, String adminID, String cpuNum, String memoryMb, String diskSizeMb, String diskmode) {
         String retVal;
         if (templateID != null && !templateID.isEmpty() && vmName != null && !vmName.isEmpty()) {
             try {
-                VCCloneVM.run("Datacenter", "Datacenter/vm/" + templateID, vmName, adminID);
+                VCCloneVM.run("Datacenter", "Datacenter/vm/" + templateID, vmName, adminID, cpuNum, memoryMb, diskSizeMb, diskmode);
                 retVal = "success finished.";
             } catch (Throwable e) {
-                e.printStackTrace();
                 retVal = "error :" + e.getMessage();
             }
         } else {
             retVal = "error :parameter cannot be null.";
+        }
+        return retVal;
+    }
+
+    /**
+     * @return 虚拟机名称列表，以json的格式，包含虚拟机名称、是否是模板、电源状态、运行状态、磁盘大小（B）、内存大小（MB）、CPU数目、操作系统全名
+     * @功能描述 返回包含虚拟机信息的字符串，以json格式给出，包含内容有：虚拟机名称、是否是模板、电源状态、运行状态、磁盘大小（B）、内存大小（MB）、CPU数目、操作系统全名。
+     * 其中运行状态以四个颜色表示：gray（不可知）、green（虚拟机正常）、red（该虚拟机出现了问题）、yellow（虚拟机可能出现了问题）
+     */
+    @WebMethod
+    public String GetVMList(String adminID) {
+        String retVal;
+        try {
+            retVal = VCGetVMList.run("Datacenter", adminID);
+        } catch (Throwable e) {
+            retVal = "error :" + e.getMessage();
         }
         return retVal;
     }
@@ -170,16 +187,6 @@ public class VCManager {
      */
     @WebMethod
     public String GetVMInfor(String vmName) {
-        return null;
-    }
-
-    /**
-     * @param vmName   虚拟机名称
-     * @param PerfUnit perf
-     * @return 如果成功则返回null，否则返回表示错误信息的字符串
-     */
-    @WebMethod
-    public String GetPerf(String vmName, String PerfUnit) {
         return null;
     }
 
@@ -217,22 +224,5 @@ public class VCManager {
     @WebMethod
     public String UploadFile(String vmName, String filePathLocal, String filePathInGuest) {
         return null;
-    }
-
-    /**
-     * @return 虚拟机名称列表，以json的格式，包含虚拟机名称、是否是模板、电源状态、运行状态、磁盘大小（B）、内存大小（MB）、CPU数目、操作系统全名
-     * @功能描述 返回包含虚拟机信息的字符串，以json格式给出，包含内容有：虚拟机名称、是否是模板、电源状态、运行状态、磁盘大小（B）、内存大小（MB）、CPU数目、操作系统全名。
-     * 其中运行状态以四个颜色表示：gray（不可知）、green（虚拟机正常）、red（该虚拟机出现了问题）、yellow（虚拟机可能出现了问题）
-     */
-    @WebMethod
-    public String GetVMList(String adminID) {
-        String retVal;
-        try {
-            retVal = VCGetVMList.run("Datacenter", adminID);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            retVal = "error :" + e.getMessage();
-        }
-        return retVal;
     }
 }
