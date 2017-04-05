@@ -14,8 +14,8 @@ public class VCDeleteEntity extends VCTaskBase {
      * @param entityName 要删除的实体的名称，如Datacenter\myFolder\myVirtualMachine
      * @功能描述 这个函数用来从清单中删除一个特定的实体，可以是虚拟机、数据中心、目录或者集群计算资源等。
      */
-    private static void deleteManagedObject(String entityName) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg, VimFaultFaultMsg, InvalidCollectorVersionFaultMsg, InvalidLoginFaultMsg, NoSuchAlgorithmException, InvalidLocaleFaultMsg, KeyManagementException {
-        ManagedObjectReference moref = VCHelper.vmByVmname(entityName, serviceContent.getPropertyCollector());
+    private void deleteManagedObject(String entityName) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg, VimFaultFaultMsg, InvalidCollectorVersionFaultMsg, InvalidLoginFaultMsg, NoSuchAlgorithmException, InvalidLocaleFaultMsg, KeyManagementException {
+        ManagedObjectReference moref = VCHelper.vmByVmname(serviceContent, vimPort, entityName, serviceContent.getPropertyCollector());
         if (moref == null) {
             logger.error(String.format("Managed entity cannot be found by name [ %s ]", entityName));
         } else {
@@ -27,7 +27,7 @@ public class VCDeleteEntity extends VCTaskBase {
         }
     }
 
-    public static void run(String vmyname) throws Exception {
+    public void run(String vmyname) throws Exception {
         try {
             init();
             deleteManagedObject(vmyname);
@@ -35,7 +35,7 @@ public class VCDeleteEntity extends VCTaskBase {
             e.printStackTrace();
             throw new Exception(e.getMessage());
         } finally {
-            VCClientSession.Disconnect();
+            vcClientSession.Disconnect();
         }
     }
 }

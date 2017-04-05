@@ -7,13 +7,13 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
-  <head>
+<head>
     <title>Virtual Resource Management</title>
-  </head>
-  <body>
-  <div>
+</head>
+<body>
+<div>
     <p>Copyright 2017 by BUAA Collage of Software Engineering</p>
     <p>All Rights Reserved</p>
-  </div>
-  </body>
+</div>
+</body>
 </html>

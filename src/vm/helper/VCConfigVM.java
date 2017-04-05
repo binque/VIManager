@@ -13,13 +13,13 @@ import java.util.Map;
  */
 public class VCConfigVM extends VCTaskBase {
 
-    public static void run(String vmName, String CPU, String memory, String diskname, String disksize, String diskmode) throws Exception {
+    public void run(String vmName, String CPU, String memory, String diskName, String diskSize, String diskMode) throws Exception {
         try {
             init();
-            ManagedObjectReference virtualmachine = VCHelper.vmByVmname(vmName, serviceContent.getPropertyCollector());
+            ManagedObjectReference virtualmachine = VCHelper.vmByVmname(serviceContent, vimPort, vmName, serviceContent.getPropertyCollector());
 
             if (virtualmachine != null) {
-                reConfig(virtualmachine, vmName, CPU, memory, diskname, disksize, diskmode);
+                reConfig(virtualmachine, vmName, CPU, memory, diskName, diskSize, diskMode);
             } else {
                 logger.error(String.format("Virtual Machine named [ %s ] not found.", vmName));
             }
@@ -27,21 +27,21 @@ public class VCConfigVM extends VCTaskBase {
             e.printStackTrace();
             throw new Exception(e.getMessage());
         } finally {
-            VCClientSession.Disconnect();
+            vcClientSession.Disconnect();
         }
     }
 
     /**
      * @param virtualMachine 虚拟机MOR
-     * @param vmName 虚拟机名称
-     * @param CPU   给虚拟机分配的cpu核心数目，可以是一个数字或者low(1)/normal(2)/high(4)
-     * @param memory   给虚拟机分配的内存大小，可以是一个数字或者low(1024)/normal(2048)/high(4096)
-     * @param diskName 给虚拟机增加或者移除的磁盘名称 虚拟磁盘模式(diskmode)、虚拟磁盘大小(disksize)
-     * @param diskSize 磁盘大小，如果指定了磁盘大小，则增加磁盘，如果未指定磁盘大小，则移除磁盘
-     * @param diskMode 磁盘模式，可选 persistent/independent_persistent/independent_nonpersistent/nonpersistent/undoable/append
+     * @param vmName         虚拟机名称
+     * @param CPU            给虚拟机分配的cpu核心数目，可以是一个数字或者low(1)/normal(2)/high(4)
+     * @param memory         给虚拟机分配的内存大小，可以是一个数字或者low(1024)/normal(2048)/high(4096)
+     * @param diskName       给虚拟机增加或者移除的磁盘名称 虚拟磁盘模式(diskmode)、虚拟磁盘大小(disksize)
+     * @param diskSize       磁盘大小，如果指定了磁盘大小，则增加磁盘，如果未指定磁盘大小，则移除磁盘
+     * @param diskMode       磁盘模式，可选 persistent/independent_persistent/independent_nonpersistent/nonpersistent/undoable/append
      * @功能描述 重新配置虚拟机
      */
-    private static void reConfig(ManagedObjectReference virtualMachine, String vmName, String CPU, String memory, String diskName, String diskSize, String diskMode) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg, InvalidCollectorVersionFaultMsg, InvalidStateFaultMsg, InsufficientResourcesFaultFaultMsg, InvalidDatastoreFaultMsg, TaskInProgressFaultMsg, DuplicateNameFaultMsg, FileFaultFaultMsg, InvalidNameFaultMsg, ConcurrentAccessFaultMsg, VmConfigFaultFaultMsg {
+    private void reConfig(ManagedObjectReference virtualMachine, String vmName, String CPU, String memory, String diskName, String diskSize, String diskMode) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg, InvalidCollectorVersionFaultMsg, InvalidStateFaultMsg, InsufficientResourcesFaultFaultMsg, InvalidDatastoreFaultMsg, TaskInProgressFaultMsg, DuplicateNameFaultMsg, FileFaultFaultMsg, InvalidNameFaultMsg, ConcurrentAccessFaultMsg, VmConfigFaultFaultMsg {
         VirtualMachineConfigSpec virtualMachineConfigSpec = new VirtualMachineConfigSpec();
         if (memory != null && !memory.isEmpty()) {
             logger.info(String.format("Reconfiguring The Virtual Machine [ %s ] For Memory Update By Value [ %s ]", vmName, memory));
@@ -78,6 +78,7 @@ public class VCConfigVM extends VCTaskBase {
                     numCpu = Integer.parseInt(CPU);
                 }
                 virtualMachineConfigSpec.setNumCPUs(numCpu);
+                virtualMachineConfigSpec.setNumCoresPerSocket(numCpu);
             } catch (NumberFormatException e) {
                 logger.error("Value of CPU update must be one of high|low|normal|[numeric value]");
                 return;
@@ -129,7 +130,7 @@ public class VCConfigVM extends VCTaskBase {
         }
     }
 
-    private static ResourceAllocationInfo getShares(String value) {
+    private ResourceAllocationInfo getShares(String value) {
         ResourceAllocationInfo raInfo = new ResourceAllocationInfo();
         SharesInfo sharesInfo = new SharesInfo();
         if (value.equalsIgnoreCase(SharesLevel.HIGH.toString())) {
@@ -155,7 +156,7 @@ public class VCConfigVM extends VCTaskBase {
      * @param diskmode       磁盘模式
      * @return 返回磁盘设备配置SPEC
      */
-    private static VirtualDeviceConfigSpec getDiskDeviceConfigSpec(ManagedObjectReference virtualMachine, String vmName, String operation, String value, String disksize, String diskmode)
+    private VirtualDeviceConfigSpec getDiskDeviceConfigSpec(ManagedObjectReference virtualMachine, String vmName, String operation, String value, String disksize, String diskmode)
             throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
         VirtualDeviceConfigSpec diskSpec = new VirtualDeviceConfigSpec();
 
@@ -188,7 +189,7 @@ public class VCConfigVM extends VCTaskBase {
             diskSpec.setDevice(disk);
         } else if (operation.equalsIgnoreCase("Remove")) {
             VirtualDisk disk = null;
-            List<VirtualDevice> deviceList = ((ArrayOfVirtualDevice) VCHelper.entityProps(virtualMachine, new String[]{"config.hardware.device"}).get("config.hardware.device")).getVirtualDevice();
+            List<VirtualDevice> deviceList = ((ArrayOfVirtualDevice) VCHelper.entityProps(serviceContent, vimPort, virtualMachine, new String[]{"config.hardware.device"}).get("config.hardware.device")).getVirtualDevice();
             for (VirtualDevice device : deviceList) {
                 if (device instanceof VirtualDisk) {
                     if (value.equalsIgnoreCase(device.getDeviceInfo().getLabel())) {
@@ -214,11 +215,11 @@ public class VCConfigVM extends VCTaskBase {
      * @return 返回密匙
      * @功能描述 获取控制器密钥和SCSI控制器上的下一个可用空闲单元号
      */
-    private static List<Integer> getControllerKey(ManagedObjectReference vmMor)
+    private List<Integer> getControllerKey(ManagedObjectReference vmMor)
             throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
         List<Integer> retVal = new ArrayList<>();
 
-        List<VirtualDevice> listvd = ((ArrayOfVirtualDevice) VCHelper.entityProps(vmMor, new String[]{"config.hardware.device"}).get("config.hardware.device")).getVirtualDevice();
+        List<VirtualDevice> listvd = ((ArrayOfVirtualDevice) VCHelper.entityProps(serviceContent, vimPort, vmMor, new String[]{"config.hardware.device"}).get("config.hardware.device")).getVirtualDevice();
 
         Map<Integer, VirtualDevice> deviceMap = new HashMap<>();
         for (VirtualDevice virtualDevice : listvd) {
@@ -258,10 +259,10 @@ public class VCConfigVM extends VCTaskBase {
         return retVal;
     }
 
-    private static VirtualDeviceConfigSpec getCDDeviceConfigSpec(ManagedObjectReference virtualMachine, String operation, String value)
+    private VirtualDeviceConfigSpec getCDDeviceConfigSpec(ManagedObjectReference virtualMachine, String operation, String value)
             throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
         VirtualDeviceConfigSpec cdSpec = new VirtualDeviceConfigSpec();
-        List<VirtualDevice> listvd = ((ArrayOfVirtualDevice) VCHelper.entityProps(virtualMachine, new String[]{"config.hardware.device"}).get("config.hardware.device")).getVirtualDevice();
+        List<VirtualDevice> listvd = ((ArrayOfVirtualDevice) VCHelper.entityProps(serviceContent, vimPort, virtualMachine, new String[]{"config.hardware.device"}).get("config.hardware.device")).getVirtualDevice();
 
         if (operation.equalsIgnoreCase("Add")) {
             cdSpec.setOperation(VirtualDeviceConfigSpecOperation.ADD);
@@ -336,7 +337,7 @@ public class VCConfigVM extends VCTaskBase {
         return cdSpec;
     }
 
-    private static VirtualDeviceConfigSpec getNICDeviceConfigSpec(ManagedObjectReference virtualMachine, String operation, String value)
+    private VirtualDeviceConfigSpec getNICDeviceConfigSpec(ManagedObjectReference virtualMachine, String operation, String value)
             throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
         VirtualDeviceConfigSpec nicSpec = new VirtualDeviceConfigSpec();
         if (operation.equalsIgnoreCase("Add")) {
@@ -351,7 +352,7 @@ public class VCConfigVM extends VCTaskBase {
         } else if (operation.equalsIgnoreCase("Remove")) {
             VirtualEthernetCard nic = null;
             nicSpec.setOperation(VirtualDeviceConfigSpecOperation.REMOVE);
-            List<VirtualDevice> listvd = ((ArrayOfVirtualDevice) VCHelper.entityProps(virtualMachine, new String[]{"config.hardware.device"}).get("config.hardware.device")).getVirtualDevice();
+            List<VirtualDevice> listvd = ((ArrayOfVirtualDevice) VCHelper.entityProps(serviceContent, vimPort, virtualMachine, new String[]{"config.hardware.device"}).get("config.hardware.device")).getVirtualDevice();
             for (VirtualDevice device : listvd) {
                 if (device instanceof VirtualEthernetCard) {
                     if (value.equalsIgnoreCase(device.getDeviceInfo().getLabel())) {
@@ -379,7 +380,7 @@ public class VCConfigVM extends VCTaskBase {
      * @return 如果参数有效，则返回true，否则返回false
      * @功能描述 检查参数的有效性，确定业务执行逻辑
      */
-    private static boolean customValidation(final String operation, final String device,
+    private boolean customValidation(final String operation, final String device,
                                             final String value, final String disksize, final String diskmode) {
         boolean flag = true;
         if (device.equalsIgnoreCase("disk")) {

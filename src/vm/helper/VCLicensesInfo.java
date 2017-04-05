@@ -8,19 +8,19 @@ import java.util.List;
 
 public class VCLicensesInfo extends VCTaskBase {
 
-    private static ManagedObjectReference licManagerRef = null;
-    private static ManagedObjectReference licenseAssignmentManagerRef = null;
-    private static List<LicenseAssignmentManagerLicenseAssignment> licenses;
+    private ManagedObjectReference licManagerRef = null;
+    private ManagedObjectReference licenseAssignmentManagerRef = null;
+    private List<LicenseAssignmentManagerLicenseAssignment> licenses;
 
-    private static void initLicAssignmentManagerRef() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
-        licenseAssignmentManagerRef = (ManagedObjectReference) VCHelper.entityProps(licManagerRef, new String[]{"licenseAssignmentManager"}).get("licenseAssignmentManager");
+    private void initLicAssignmentManagerRef() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+        licenseAssignmentManagerRef = (ManagedObjectReference) VCHelper.entityProps(serviceContent, vimPort, licManagerRef, new String[]{"licenseAssignmentManager"}).get("licenseAssignmentManager");
     }
 
-    private static void initLicenseAssignmentManagerLicenseAssignments() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+    private void initLicenseAssignmentManagerLicenseAssignments() throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
         licenses = vimPort.queryAssignedLicenses(licenseAssignmentManagerRef, null);
     }
 
-    private static String getInfo() {
+    private String getInfo() {
         JSONArray JsonInfo = new JSONArray();
         for (LicenseAssignmentManagerLicenseAssignment license : licenses) {
             LicenseManagerLicenseInfo assignedLicense = license.getAssignedLicense();
@@ -44,7 +44,7 @@ public class VCLicensesInfo extends VCTaskBase {
         return JsonInfo.toString();
     }
 
-    public static String run() throws Exception {
+    public String run() throws Exception {
         try {
             init();
             if (serviceContent != null) {
@@ -57,7 +57,7 @@ public class VCLicensesInfo extends VCTaskBase {
             e.printStackTrace();
             throw new Exception(e.getMessage());
         } finally {
-            VCClientSession.Disconnect();
+            vcClientSession.Disconnect();
         }
 
     }

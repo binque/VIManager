@@ -1,560 +1,562 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<wsdl:definitions targetNamespace="http://manager.vm" xmlns:impl="http://manager.vm" xmlns:intf="http://manager.vm"
-                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/"
-                  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-<!--WSDL created by Apache Axis version: 1.4
-Built on Apr 22, 2006 (06:55:48 PDT)-->
- <wsdl:types>
-  <schema elementFormDefault="qualified" targetNamespace="http://manager.vm" xmlns="http://www.w3.org/2001/XMLSchema">
-   <element name="templateID" type="xsd:string"/>
-   <element name="vmName" type="xsd:string"/>
-   <element name="adminID" type="xsd:string"/>
-   <element name="cpuNum" type="xsd:string"/>
-   <element name="memoryMb" type="xsd:string"/>
-   <element name="diskSizeMb" type="xsd:string"/>
-   <element name="diskmode" type="xsd:string"/>
-   <element name="CreateFromTemplateReturn" type="xsd:string"/>
-   <element name="vmName1" type="xsd:string"/>
-   <element name="CPU" type="xsd:string"/>
-   <element name="memory" type="xsd:string"/>
-   <element name="diskname" type="xsd:string"/>
-   <element name="disksize" type="xsd:string"/>
-   <element name="diskmode1" type="xsd:string"/>
-   <element name="ChangeConfigReturn" type="xsd:string"/>
-   <element name="vmName2" type="xsd:string"/>
-   <element name="filePathLocal" type="xsd:string"/>
-   <element name="filePathInGuest" type="xsd:string"/>
-   <element name="UploadFileReturn" type="xsd:string"/>
-   <element name="vmName3" type="xsd:string"/>
-   <element name="Op" type="xsd:string"/>
-   <element name="BasicOpsReturn" type="xsd:string"/>
-   <element name="vmName4" type="xsd:string"/>
-   <element name="fileDir" type="xsd:string"/>
-   <element name="args" type="xsd:string"/>
-   <element name="RunGuestProgramReturn" type="xsd:string"/>
-   <element name="GetStorageInfoReturn" type="xsd:string"/>
-   <element name="GetHostInfoReturn" type="xsd:string"/>
-   <element name="adminID1" type="xsd:string"/>
-   <element name="GetVMListReturn" type="xsd:string"/>
-   <element name="vmName5" type="xsd:string"/>
-   <element name="targetDir" type="xsd:string"/>
-   <element name="ExportVMReturn" type="xsd:string"/>
-   <element name="vmName6" type="xsd:string"/>
-   <element name="GetVMInforReturn" type="xsd:string"/>
-   <element name="GetLicenseInfoReturn" type="xsd:string"/>
-   <element name="vmName7" type="xsd:string"/>
-   <element name="op" type="xsd:string"/>
-   <element name="snapshotname" type="xsd:string"/>
-   <element name="SnapShotOpsReturn" type="xsd:string"/>
-  </schema>
- </wsdl:types>
+<wsdl:definitions xmlns:impl="http://manager.vm" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  targetNamespace="http://manager.vm">
+    <!--WSDL created by Apache Axis version: 1.4
+    Built on Apr 22, 2006 (06:55:48 PDT)-->
+    <wsdl:types>
+        <schema elementFormDefault="qualified" targetNamespace="http://manager.vm"
+                xmlns="http://www.w3.org/2001/XMLSchema">
+            <element name="templateID" type="xsd:string"/>
+            <element name="vmName" type="xsd:string"/>
+            <element name="adminID" type="xsd:string"/>
+            <element name="cpuNum" type="xsd:string"/>
+            <element name="memoryMb" type="xsd:string"/>
+            <element name="diskSizeMb" type="xsd:string"/>
+            <element name="diskmode" type="xsd:string"/>
+            <element name="CreateFromTemplateReturn" type="xsd:string"/>
+            <element name="vmName1" type="xsd:string"/>
+            <element name="CPU" type="xsd:string"/>
+            <element name="memory" type="xsd:string"/>
+            <element name="diskname" type="xsd:string"/>
+            <element name="disksize" type="xsd:string"/>
+            <element name="diskmode1" type="xsd:string"/>
+            <element name="ChangeConfigReturn" type="xsd:string"/>
+            <element name="vmName2" type="xsd:string"/>
+            <element name="filePathLocal" type="xsd:string"/>
+            <element name="filePathInGuest" type="xsd:string"/>
+            <element name="UploadFileReturn" type="xsd:string"/>
+            <element name="vmName3" type="xsd:string"/>
+            <element name="Op" type="xsd:string"/>
+            <element name="BasicOpsReturn" type="xsd:string"/>
+            <element name="vmName4" type="xsd:string"/>
+            <element name="fileDir" type="xsd:string"/>
+            <element name="args" type="xsd:string"/>
+            <element name="RunGuestProgramReturn" type="xsd:string"/>
+            <element name="GetStorageInfoReturn" type="xsd:string"/>
+            <element name="GetHostInfoReturn" type="xsd:string"/>
+            <element name="adminID1" type="xsd:string"/>
+            <element name="GetVMListReturn" type="xsd:string"/>
+            <element name="vmName5" type="xsd:string"/>
+            <element name="targetDir" type="xsd:string"/>
+            <element name="ExportVMReturn" type="xsd:string"/>
+            <element name="vmName6" type="xsd:string"/>
+            <element name="GetVMInforReturn" type="xsd:string"/>
+            <element name="GetLicenseInfoReturn" type="xsd:string"/>
+            <element name="vmName7" type="xsd:string"/>
+            <element name="op" type="xsd:string"/>
+            <element name="snapshotname" type="xsd:string"/>
+            <element name="SnapShotOpsReturn" type="xsd:string"/>
+        </schema>
+    </wsdl:types>
 
-   <wsdl:message name="ExportVMResponse">
+    <wsdl:message name="ExportVMResponse">
 
-      <wsdl:part element="impl:ExportVMReturn" name="ExportVMReturn"/>
+        <wsdl:part element="impl:ExportVMReturn" name="ExportVMReturn"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="CreateFromTemplateRequest">
+    <wsdl:message name="CreateFromTemplateRequest">
 
-      <wsdl:part element="impl:templateID" name="templateID"/>
+        <wsdl:part element="impl:templateID" name="templateID"/>
 
-      <wsdl:part element="impl:vmName" name="vmName"/>
+        <wsdl:part element="impl:vmName" name="vmName"/>
 
-      <wsdl:part element="impl:adminID" name="adminID"/>
+        <wsdl:part element="impl:adminID" name="adminID"/>
 
-      <wsdl:part element="impl:cpuNum" name="cpuNum"/>
+        <wsdl:part element="impl:cpuNum" name="cpuNum"/>
 
-      <wsdl:part element="impl:memoryMb" name="memoryMb"/>
+        <wsdl:part element="impl:memoryMb" name="memoryMb"/>
 
-      <wsdl:part element="impl:diskSizeMb" name="diskSizeMb"/>
+        <wsdl:part element="impl:diskSizeMb" name="diskSizeMb"/>
 
-      <wsdl:part element="impl:diskmode" name="diskmode"/>
+        <wsdl:part element="impl:diskmode" name="diskmode"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="CreateFromTemplateResponse">
+    <wsdl:message name="CreateFromTemplateResponse">
 
-      <wsdl:part element="impl:CreateFromTemplateReturn" name="CreateFromTemplateReturn"/>
+        <wsdl:part element="impl:CreateFromTemplateReturn" name="CreateFromTemplateReturn"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="ChangeConfigResponse">
+    <wsdl:message name="ChangeConfigResponse">
 
-      <wsdl:part element="impl:ChangeConfigReturn" name="ChangeConfigReturn"/>
+        <wsdl:part element="impl:ChangeConfigReturn" name="ChangeConfigReturn"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="GetHostInfoResponse">
+    <wsdl:message name="GetHostInfoResponse">
 
-      <wsdl:part element="impl:GetHostInfoReturn" name="GetHostInfoReturn"/>
+        <wsdl:part element="impl:GetHostInfoReturn" name="GetHostInfoReturn"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="UploadFileRequest">
+    <wsdl:message name="UploadFileRequest">
 
-      <wsdl:part element="impl:vmName2" name="vmName"/>
+        <wsdl:part element="impl:vmName2" name="vmName"/>
 
-      <wsdl:part element="impl:filePathLocal" name="filePathLocal"/>
+        <wsdl:part element="impl:filePathLocal" name="filePathLocal"/>
 
-      <wsdl:part element="impl:filePathInGuest" name="filePathInGuest"/>
+        <wsdl:part element="impl:filePathInGuest" name="filePathInGuest"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="BasicOpsResponse">
+    <wsdl:message name="BasicOpsResponse">
 
-      <wsdl:part element="impl:BasicOpsReturn" name="BasicOpsReturn"/>
+        <wsdl:part element="impl:BasicOpsReturn" name="BasicOpsReturn"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="RunGuestProgramRequest">
+    <wsdl:message name="RunGuestProgramRequest">
 
-      <wsdl:part element="impl:vmName4" name="vmName"/>
+        <wsdl:part element="impl:vmName4" name="vmName"/>
 
-      <wsdl:part element="impl:fileDir" name="fileDir"/>
+        <wsdl:part element="impl:fileDir" name="fileDir"/>
 
-      <wsdl:part element="impl:args" name="args"/>
+        <wsdl:part element="impl:args" name="args"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="GetVMInforRequest">
+    <wsdl:message name="GetVMInforRequest">
 
-      <wsdl:part element="impl:vmName6" name="vmName"/>
+        <wsdl:part element="impl:vmName6" name="vmName"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="GetVMListResponse">
+    <wsdl:message name="GetVMListResponse">
 
-      <wsdl:part element="impl:GetVMListReturn" name="GetVMListReturn"/>
+        <wsdl:part element="impl:GetVMListReturn" name="GetVMListReturn"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="GetLicenseInfoRequest">
+    <wsdl:message name="GetLicenseInfoRequest">
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="ExportVMRequest">
+    <wsdl:message name="ExportVMRequest">
 
-      <wsdl:part element="impl:vmName5" name="vmName"/>
+        <wsdl:part element="impl:vmName5" name="vmName"/>
 
-      <wsdl:part element="impl:targetDir" name="targetDir"/>
+        <wsdl:part element="impl:targetDir" name="targetDir"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="GetVMInforResponse">
+    <wsdl:message name="GetVMInforResponse">
 
-      <wsdl:part element="impl:GetVMInforReturn" name="GetVMInforReturn"/>
+        <wsdl:part element="impl:GetVMInforReturn" name="GetVMInforReturn"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="RunGuestProgramResponse">
+    <wsdl:message name="RunGuestProgramResponse">
 
-      <wsdl:part element="impl:RunGuestProgramReturn" name="RunGuestProgramReturn"/>
+        <wsdl:part element="impl:RunGuestProgramReturn" name="RunGuestProgramReturn"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="GetLicenseInfoResponse">
+    <wsdl:message name="GetLicenseInfoResponse">
 
-      <wsdl:part element="impl:GetLicenseInfoReturn" name="GetLicenseInfoReturn"/>
+        <wsdl:part element="impl:GetLicenseInfoReturn" name="GetLicenseInfoReturn"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="UploadFileResponse">
+    <wsdl:message name="UploadFileResponse">
 
-      <wsdl:part element="impl:UploadFileReturn" name="UploadFileReturn"/>
+        <wsdl:part element="impl:UploadFileReturn" name="UploadFileReturn"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="GetVMListRequest">
+    <wsdl:message name="GetVMListRequest">
 
-      <wsdl:part element="impl:adminID1" name="adminID"/>
+        <wsdl:part element="impl:adminID1" name="adminID"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="GetStorageInfoRequest">
+    <wsdl:message name="GetStorageInfoRequest">
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="GetHostInfoRequest">
+    <wsdl:message name="GetHostInfoRequest">
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="GetStorageInfoResponse">
+    <wsdl:message name="GetStorageInfoResponse">
 
-      <wsdl:part element="impl:GetStorageInfoReturn" name="GetStorageInfoReturn"/>
+        <wsdl:part element="impl:GetStorageInfoReturn" name="GetStorageInfoReturn"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="SnapShotOpsRequest">
+    <wsdl:message name="SnapShotOpsRequest">
 
-      <wsdl:part element="impl:vmName7" name="vmName"/>
+        <wsdl:part element="impl:vmName7" name="vmName"/>
 
-      <wsdl:part element="impl:op" name="op"/>
+        <wsdl:part element="impl:op" name="op"/>
 
-      <wsdl:part element="impl:snapshotname" name="snapshotname"/>
+        <wsdl:part element="impl:snapshotname" name="snapshotname"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="BasicOpsRequest">
+    <wsdl:message name="BasicOpsRequest">
 
-      <wsdl:part element="impl:vmName3" name="vmName"/>
+        <wsdl:part element="impl:vmName3" name="vmName"/>
 
-      <wsdl:part element="impl:Op" name="Op"/>
+        <wsdl:part element="impl:Op" name="Op"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="ChangeConfigRequest">
+    <wsdl:message name="ChangeConfigRequest">
 
-      <wsdl:part element="impl:vmName1" name="vmName"/>
+        <wsdl:part element="impl:vmName1" name="vmName"/>
 
-      <wsdl:part element="impl:CPU" name="CPU"/>
+        <wsdl:part element="impl:CPU" name="CPU"/>
 
-      <wsdl:part element="impl:memory" name="memory"/>
+        <wsdl:part element="impl:memory" name="memory"/>
 
-      <wsdl:part element="impl:diskname" name="diskname"/>
+        <wsdl:part element="impl:diskname" name="diskname"/>
 
-      <wsdl:part element="impl:disksize" name="disksize"/>
+        <wsdl:part element="impl:disksize" name="disksize"/>
 
-      <wsdl:part element="impl:diskmode1" name="diskmode"/>
+        <wsdl:part element="impl:diskmode1" name="diskmode"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:message name="SnapShotOpsResponse">
+    <wsdl:message name="SnapShotOpsResponse">
 
-      <wsdl:part element="impl:SnapShotOpsReturn" name="SnapShotOpsReturn"/>
+        <wsdl:part element="impl:SnapShotOpsReturn" name="SnapShotOpsReturn"/>
 
-   </wsdl:message>
+    </wsdl:message>
 
-   <wsdl:portType name="VCManager">
+    <wsdl:portType name="VCManager">
 
-      <wsdl:operation name="CreateFromTemplate" parameterOrder="templateID vmName adminID cpuNum memoryMb diskSizeMb diskmode">
+        <wsdl:operation name="CreateFromTemplate"
+                        parameterOrder="templateID vmName adminID cpuNum memoryMb diskSizeMb diskmode">
 
-         <wsdl:input message="impl:CreateFromTemplateRequest" name="CreateFromTemplateRequest"/>
+            <wsdl:input message="impl:CreateFromTemplateRequest" name="CreateFromTemplateRequest"/>
 
-         <wsdl:output message="impl:CreateFromTemplateResponse" name="CreateFromTemplateResponse"/>
+            <wsdl:output message="impl:CreateFromTemplateResponse" name="CreateFromTemplateResponse"/>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="ChangeConfig" parameterOrder="vmName CPU memory diskname disksize diskmode">
+        <wsdl:operation name="ChangeConfig" parameterOrder="vmName CPU memory diskname disksize diskmode">
 
-         <wsdl:input message="impl:ChangeConfigRequest" name="ChangeConfigRequest"/>
+            <wsdl:input message="impl:ChangeConfigRequest" name="ChangeConfigRequest"/>
 
-         <wsdl:output message="impl:ChangeConfigResponse" name="ChangeConfigResponse"/>
+            <wsdl:output message="impl:ChangeConfigResponse" name="ChangeConfigResponse"/>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="UploadFile" parameterOrder="vmName filePathLocal filePathInGuest">
+        <wsdl:operation name="UploadFile" parameterOrder="vmName filePathLocal filePathInGuest">
 
-         <wsdl:input message="impl:UploadFileRequest" name="UploadFileRequest"/>
+            <wsdl:input message="impl:UploadFileRequest" name="UploadFileRequest"/>
 
-         <wsdl:output message="impl:UploadFileResponse" name="UploadFileResponse"/>
+            <wsdl:output message="impl:UploadFileResponse" name="UploadFileResponse"/>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="BasicOps" parameterOrder="vmName Op">
+        <wsdl:operation name="BasicOps" parameterOrder="vmName Op">
 
-         <wsdl:input message="impl:BasicOpsRequest" name="BasicOpsRequest"/>
+            <wsdl:input message="impl:BasicOpsRequest" name="BasicOpsRequest"/>
 
-         <wsdl:output message="impl:BasicOpsResponse" name="BasicOpsResponse"/>
+            <wsdl:output message="impl:BasicOpsResponse" name="BasicOpsResponse"/>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="RunGuestProgram" parameterOrder="vmName fileDir args">
+        <wsdl:operation name="RunGuestProgram" parameterOrder="vmName fileDir args">
 
-         <wsdl:input message="impl:RunGuestProgramRequest" name="RunGuestProgramRequest"/>
+            <wsdl:input message="impl:RunGuestProgramRequest" name="RunGuestProgramRequest"/>
 
-         <wsdl:output message="impl:RunGuestProgramResponse" name="RunGuestProgramResponse"/>
+            <wsdl:output message="impl:RunGuestProgramResponse" name="RunGuestProgramResponse"/>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="GetStorageInfo">
+        <wsdl:operation name="GetStorageInfo">
 
-         <wsdl:input message="impl:GetStorageInfoRequest" name="GetStorageInfoRequest"/>
+            <wsdl:input message="impl:GetStorageInfoRequest" name="GetStorageInfoRequest"/>
 
-         <wsdl:output message="impl:GetStorageInfoResponse" name="GetStorageInfoResponse"/>
+            <wsdl:output message="impl:GetStorageInfoResponse" name="GetStorageInfoResponse"/>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="GetHostInfo">
+        <wsdl:operation name="GetHostInfo">
 
-         <wsdl:input message="impl:GetHostInfoRequest" name="GetHostInfoRequest"/>
+            <wsdl:input message="impl:GetHostInfoRequest" name="GetHostInfoRequest"/>
 
-         <wsdl:output message="impl:GetHostInfoResponse" name="GetHostInfoResponse"/>
+            <wsdl:output message="impl:GetHostInfoResponse" name="GetHostInfoResponse"/>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="GetVMList" parameterOrder="adminID">
+        <wsdl:operation name="GetVMList" parameterOrder="adminID">
 
-         <wsdl:input message="impl:GetVMListRequest" name="GetVMListRequest"/>
+            <wsdl:input message="impl:GetVMListRequest" name="GetVMListRequest"/>
 
-         <wsdl:output message="impl:GetVMListResponse" name="GetVMListResponse"/>
+            <wsdl:output message="impl:GetVMListResponse" name="GetVMListResponse"/>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="ExportVM" parameterOrder="vmName targetDir">
+        <wsdl:operation name="ExportVM" parameterOrder="vmName targetDir">
 
-         <wsdl:input message="impl:ExportVMRequest" name="ExportVMRequest"/>
+            <wsdl:input message="impl:ExportVMRequest" name="ExportVMRequest"/>
 
-         <wsdl:output message="impl:ExportVMResponse" name="ExportVMResponse"/>
+            <wsdl:output message="impl:ExportVMResponse" name="ExportVMResponse"/>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="GetVMInfor" parameterOrder="vmName">
+        <wsdl:operation name="GetVMInfor" parameterOrder="vmName">
 
-         <wsdl:input message="impl:GetVMInforRequest" name="GetVMInforRequest"/>
+            <wsdl:input message="impl:GetVMInforRequest" name="GetVMInforRequest"/>
 
-         <wsdl:output message="impl:GetVMInforResponse" name="GetVMInforResponse"/>
+            <wsdl:output message="impl:GetVMInforResponse" name="GetVMInforResponse"/>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="GetLicenseInfo">
+        <wsdl:operation name="GetLicenseInfo">
 
-         <wsdl:input message="impl:GetLicenseInfoRequest" name="GetLicenseInfoRequest"/>
+            <wsdl:input message="impl:GetLicenseInfoRequest" name="GetLicenseInfoRequest"/>
 
-         <wsdl:output message="impl:GetLicenseInfoResponse" name="GetLicenseInfoResponse"/>
+            <wsdl:output message="impl:GetLicenseInfoResponse" name="GetLicenseInfoResponse"/>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="SnapShotOps" parameterOrder="vmName op snapshotname">
+        <wsdl:operation name="SnapShotOps" parameterOrder="vmName op snapshotname">
 
-         <wsdl:input message="impl:SnapShotOpsRequest" name="SnapShotOpsRequest"/>
+            <wsdl:input message="impl:SnapShotOpsRequest" name="SnapShotOpsRequest"/>
 
-         <wsdl:output message="impl:SnapShotOpsResponse" name="SnapShotOpsResponse"/>
+            <wsdl:output message="impl:SnapShotOpsResponse" name="SnapShotOpsResponse"/>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-   </wsdl:portType>
+    </wsdl:portType>
 
-   <wsdl:binding name="VCManagerSoapBinding" type="impl:VCManager">
+    <wsdl:binding name="VCManagerSoapBinding" type="impl:VCManager">
 
-      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
 
-      <wsdl:operation name="CreateFromTemplate">
+        <wsdl:operation name="CreateFromTemplate">
 
-         <wsdlsoap:operation soapAction=""/>
+            <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="CreateFromTemplateRequest">
+            <wsdl:input name="CreateFromTemplateRequest">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:input>
+            </wsdl:input>
 
-         <wsdl:output name="CreateFromTemplateResponse">
+            <wsdl:output name="CreateFromTemplateResponse">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:output>
+            </wsdl:output>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="ChangeConfig">
+        <wsdl:operation name="ChangeConfig">
 
-         <wsdlsoap:operation soapAction=""/>
+            <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="ChangeConfigRequest">
+            <wsdl:input name="ChangeConfigRequest">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:input>
+            </wsdl:input>
 
-         <wsdl:output name="ChangeConfigResponse">
+            <wsdl:output name="ChangeConfigResponse">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:output>
+            </wsdl:output>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="UploadFile">
+        <wsdl:operation name="UploadFile">
 
-         <wsdlsoap:operation soapAction=""/>
+            <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="UploadFileRequest">
+            <wsdl:input name="UploadFileRequest">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:input>
+            </wsdl:input>
 
-         <wsdl:output name="UploadFileResponse">
+            <wsdl:output name="UploadFileResponse">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:output>
+            </wsdl:output>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="BasicOps">
+        <wsdl:operation name="BasicOps">
 
-         <wsdlsoap:operation soapAction=""/>
+            <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="BasicOpsRequest">
+            <wsdl:input name="BasicOpsRequest">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:input>
+            </wsdl:input>
 
-         <wsdl:output name="BasicOpsResponse">
+            <wsdl:output name="BasicOpsResponse">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:output>
+            </wsdl:output>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="RunGuestProgram">
+        <wsdl:operation name="RunGuestProgram">
 
-         <wsdlsoap:operation soapAction=""/>
+            <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="RunGuestProgramRequest">
+            <wsdl:input name="RunGuestProgramRequest">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:input>
+            </wsdl:input>
 
-         <wsdl:output name="RunGuestProgramResponse">
+            <wsdl:output name="RunGuestProgramResponse">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:output>
+            </wsdl:output>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="GetStorageInfo">
+        <wsdl:operation name="GetStorageInfo">
 
-         <wsdlsoap:operation soapAction=""/>
+            <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="GetStorageInfoRequest">
+            <wsdl:input name="GetStorageInfoRequest">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:input>
+            </wsdl:input>
 
-         <wsdl:output name="GetStorageInfoResponse">
+            <wsdl:output name="GetStorageInfoResponse">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:output>
+            </wsdl:output>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="GetHostInfo">
+        <wsdl:operation name="GetHostInfo">
 
-         <wsdlsoap:operation soapAction=""/>
+            <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="GetHostInfoRequest">
+            <wsdl:input name="GetHostInfoRequest">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:input>
+            </wsdl:input>
 
-         <wsdl:output name="GetHostInfoResponse">
+            <wsdl:output name="GetHostInfoResponse">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:output>
+            </wsdl:output>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="GetVMList">
+        <wsdl:operation name="GetVMList">
 
-         <wsdlsoap:operation soapAction=""/>
+            <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="GetVMListRequest">
+            <wsdl:input name="GetVMListRequest">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:input>
+            </wsdl:input>
 
-         <wsdl:output name="GetVMListResponse">
+            <wsdl:output name="GetVMListResponse">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:output>
+            </wsdl:output>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="ExportVM">
+        <wsdl:operation name="ExportVM">
 
-         <wsdlsoap:operation soapAction=""/>
+            <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="ExportVMRequest">
+            <wsdl:input name="ExportVMRequest">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:input>
+            </wsdl:input>
 
-         <wsdl:output name="ExportVMResponse">
+            <wsdl:output name="ExportVMResponse">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:output>
+            </wsdl:output>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="GetVMInfor">
+        <wsdl:operation name="GetVMInfor">
 
-         <wsdlsoap:operation soapAction=""/>
+            <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="GetVMInforRequest">
+            <wsdl:input name="GetVMInforRequest">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:input>
+            </wsdl:input>
 
-         <wsdl:output name="GetVMInforResponse">
+            <wsdl:output name="GetVMInforResponse">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:output>
+            </wsdl:output>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="GetLicenseInfo">
+        <wsdl:operation name="GetLicenseInfo">
 
-         <wsdlsoap:operation soapAction=""/>
+            <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="GetLicenseInfoRequest">
+            <wsdl:input name="GetLicenseInfoRequest">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:input>
+            </wsdl:input>
 
-         <wsdl:output name="GetLicenseInfoResponse">
+            <wsdl:output name="GetLicenseInfoResponse">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:output>
+            </wsdl:output>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-      <wsdl:operation name="SnapShotOps">
+        <wsdl:operation name="SnapShotOps">
 
-         <wsdlsoap:operation soapAction=""/>
+            <wsdlsoap:operation soapAction=""/>
 
-         <wsdl:input name="SnapShotOpsRequest">
+            <wsdl:input name="SnapShotOpsRequest">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:input>
+            </wsdl:input>
 
-         <wsdl:output name="SnapShotOpsResponse">
+            <wsdl:output name="SnapShotOpsResponse">
 
-            <wsdlsoap:body use="literal"/>
+                <wsdlsoap:body use="literal"/>
 
-         </wsdl:output>
+            </wsdl:output>
 
-      </wsdl:operation>
+        </wsdl:operation>
 
-   </wsdl:binding>
+    </wsdl:binding>
 
-   <wsdl:service name="VCManagerService">
+    <wsdl:service name="VCManagerService">
 
-      <wsdl:port binding="impl:VCManagerSoapBinding" name="VCManager">
+        <wsdl:port binding="impl:VCManagerSoapBinding" name="VCManager">
 
-         <wsdlsoap:address location="http://localhost:8080//services/vm/manager/VCManager"/>
+            <wsdlsoap:address location="http://localhost:8080//services/vm/manager/VCManager"/>
 
-      </wsdl:port>
+        </wsdl:port>
 
-   </wsdl:service>
+    </wsdl:service>
 
 </wsdl:definitions>

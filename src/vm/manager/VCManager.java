@@ -1,7 +1,7 @@
 /*
   Created by huxiaon 2017/3/13.
  */
- package vm.manager;
+package vm.manager;
 
 import vm.helper.*;
 
@@ -27,7 +27,7 @@ public class VCManager {
     public String ChangeConfig(String vmName, String CPU, String memory, String diskname, String disksize, String diskmode) {
         String retVal;
         try {
-            VCConfigVM.run(vmName, CPU, memory, diskname, disksize, diskmode);
+            new VCConfigVM().run(vmName, CPU, memory, diskname, disksize, diskmode);
             retVal = "success finished.";
         } catch (Throwable e) {
             retVal = "error :" + e.getMessage();
@@ -42,7 +42,7 @@ public class VCManager {
     public String GetHostInfo() {
         String info;
         try {
-            info = VCHostInfo.run();
+            info = new VCHostInfo().run();
         } catch (Exception e) {
             info = "error :" + e.getMessage();
         }
@@ -56,7 +56,7 @@ public class VCManager {
     public String GetLicenseInfo() {
         String info;
         try {
-            info = VCLicensesInfo.run();
+            info = new VCLicensesInfo().run();
         } catch (Exception e) {
             info = "error :" + e.getMessage();
         }
@@ -70,7 +70,7 @@ public class VCManager {
     public String GetStorageInfo() {
         String info;
         try {
-            info = VCStorageInfo.run();
+            info = new VCStorageInfo().run();
         } catch (Exception e) {
             info = "error :" + e.getMessage();
         }
@@ -90,7 +90,7 @@ public class VCManager {
             try {
                 switch (Op.toLowerCase()) {
                     case "delete": {
-                        VCDeleteEntity.run(vmName);
+                        new VCDeleteEntity().run(vmName);
                         retVal = "success finished.";
                     }
                     case "poweron": {
@@ -129,20 +129,20 @@ public class VCManager {
     /**
      * @param templateID 模板名称
      * @param vmName     虚拟机名称
-     * @param adminID 虚拟机管理员名称，该信息储存在Annotation中
-     * @param cpuNum 克隆虚拟机的cpu核心数目
-     * @param memoryMb 克隆虚拟机的内存大小
+     * @param adminID    虚拟机管理员名称，该信息储存在Annotation中
+     * @param cpuNum     克隆虚拟机的cpu核心数目
+     * @param memoryMb   克隆虚拟机的内存大小
      * @param diskSizeMb 克隆虚拟机的磁盘大小
-     * @param diskmode 克隆虚拟机的磁盘模式，见配置虚拟机说明
+     * @param diskmode   克隆虚拟机的磁盘模式，见配置虚拟机说明
      * @return 如果任务执行完成（不意味着虚拟机创建完成），返回以success开始的字符串；否则返回以error开始，表示错误信息的字符串
      * @功能描述 从模板创建一个虚拟机
      */
     @WebMethod
-    public String CreateFromTemplate(String templateID, String vmName, String adminID, String cpuNum, String memoryMb, String diskSizeMb, String diskmode) {
+    public String CreateFromTemplate(String templateID, String vmName, String adminID, String studentID, String cpuNum, String memoryMb, String diskSizeMb, String diskmode) {
         String retVal;
         if (templateID != null && !templateID.isEmpty() && vmName != null && !vmName.isEmpty()) {
             try {
-                VCCloneVM.run("Datacenter", "Datacenter/vm/" + templateID, vmName, adminID, cpuNum, memoryMb, diskSizeMb, diskmode);
+                new VCCloneVM().run("Datacenter", "Datacenter/vm/" + templateID, vmName, adminID, studentID, cpuNum, memoryMb, diskSizeMb, diskmode);
                 retVal = "success finished.";
             } catch (Throwable e) {
                 retVal = "error :" + e.getMessage();
@@ -159,10 +159,10 @@ public class VCManager {
      * 其中运行状态以四个颜色表示：gray（不可知）、green（虚拟机正常）、red（该虚拟机出现了问题）、yellow（虚拟机可能出现了问题）
      */
     @WebMethod
-    public String GetVMList(String adminID) {
+    public String GetVMList(String adminID, String studentID) {
         String retVal;
         try {
-            retVal = VCGetVMList.run("Datacenter", adminID);
+            retVal = new VCGetVMList().run("Datacenter", adminID, studentID);
         } catch (Throwable e) {
             retVal = "error :" + e.getMessage();
         }

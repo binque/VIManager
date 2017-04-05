@@ -9,7 +9,6 @@ import java.util.*;
  * Completed By Huxiao
  */
 class VCHelper {
-
     /**
      * @param container 所搜寻的容器
      * @param morefType 要过滤的类型
@@ -17,20 +16,26 @@ class VCHelper {
      * @功能描述 返回在属性列表中过滤的所提供容器的原始RetrieveResult对象
      */
     private static RetrieveResult containerViewByType(
+            final ServiceContent serviceContent,
+            final VimPortType vimPort,
             final ManagedObjectReference container,
             final String morefType,
             final RetrieveOptions retrieveOptions,
             final String... morefProperties
     ) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
 
-        PropertyFilterSpec[] propertyFilterSpecs = propertyFilterSpecs(container, morefType, morefProperties);
-        return containerViewByType(container, morefType, morefProperties, retrieveOptions, propertyFilterSpecs);
+        PropertyFilterSpec[] propertyFilterSpecs = propertyFilterSpecs(serviceContent, vimPort, container, morefType, morefProperties);
+        return containerViewByType(serviceContent, vimPort, container, morefType, morefProperties, retrieveOptions, propertyFilterSpecs);
     }
 
-    private static PropertyFilterSpec[] propertyFilterSpecs(ManagedObjectReference container, String morefType, String[] morefProperties) throws RuntimeFaultFaultMsg {
-
-        ManagedObjectReference viewManager = VCClientSession.getServiceContent().getViewManager();
-        ManagedObjectReference containerView = VCClientSession.getVimPort().createContainerView(viewManager, container, Collections.singletonList(morefType), true);
+    private static PropertyFilterSpec[] propertyFilterSpecs(
+            final ServiceContent serviceContent,
+            final VimPortType vimPort,
+            final ManagedObjectReference container,
+            final String morefType,
+            final String[] morefProperties) throws RuntimeFaultFaultMsg {
+        ManagedObjectReference viewManager = serviceContent.getViewManager();
+        ManagedObjectReference containerView = vimPort.createContainerView(viewManager, container, Collections.singletonList(morefType), true);
 
         return new PropertyFilterSpec[]{
                 new PropertyFilterSpecBuilder()
@@ -55,13 +60,15 @@ class VCHelper {
     }
 
     private static RetrieveResult containerViewByType(
+            final ServiceContent serviceContent,
+            final VimPortType vimPort,
             final ManagedObjectReference container,
             final String morType,
             final String[] morPropertie,
             final RetrieveOptions retrieveOptions,
             final PropertyFilterSpec... propertyFilterSpecs
     ) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
-        return VCClientSession.getVimPort().retrievePropertiesEx(VCClientSession.getServiceContent().getPropertyCollector(),
+        return vimPort.retrievePropertiesEx(serviceContent.getPropertyCollector(),
                 Arrays.asList(propertyFilterSpecs),
                 retrieveOptions);
     }
@@ -73,10 +80,15 @@ class VCHelper {
      * @return 映射的MOREF和映射的名称值对的属性请求的托管对象存在。 如果不存在，则返回空映射
      * @功能描述 返回指定容器下面指定类型的所有MOREF
      */
-    static Map<ManagedObjectReference, Map<String, Object>> inContainerByType(ManagedObjectReference container, String morefType,
-                                                                              String[] morefProperties, RetrieveOptions retrieveOptions) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+    static Map<ManagedObjectReference, Map<String, Object>> inContainerByType(
+            final ServiceContent serviceContent,
+            final VimPortType vimPort,
+            final ManagedObjectReference container,
+            final String morefType,
+            final String[] morefProperties,
+            final RetrieveOptions retrieveOptions) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
         Map<ManagedObjectReference, Map<String, Object>> tgetMoref = null;
-        RetrieveResult retrieveResult = containerViewByType(container, morefType, retrieveOptions, morefProperties);
+        RetrieveResult retrieveResult = containerViewByType(serviceContent, vimPort, container, morefType, retrieveOptions, morefProperties);
         if (retrieveResult != null) {
             List<ObjectContent> listcont = retrieveResult.getObjects();
             tgetMoref = new HashMap<>();
@@ -103,20 +115,30 @@ class VCHelper {
      * @return 映射的MOREF和映射的名称值对的属性请求的托管对象存在。 如果不存在，则返回空映射
      * @功能描述 返回指定容器下面指定类型的所有MOREF
      */
-    private static Map<String, ManagedObjectReference> inContainerByType(ManagedObjectReference folder, String morefType, RetrieveOptions retrieveOptions) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
-        RetrieveResult retrieveResult = containerViewByType(folder, morefType, retrieveOptions);
-        return toMap(retrieveResult);
+    private static Map<String, ManagedObjectReference> inContainerByType(
+            final ServiceContent serviceContent,
+            final VimPortType vimPort,
+            final ManagedObjectReference folder,
+            final String morefType,
+            final RetrieveOptions retrieveOptions) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+        RetrieveResult retrieveResult = containerViewByType(serviceContent, vimPort, folder, morefType, retrieveOptions);
+        return toMap(serviceContent, vimPort, retrieveResult);
     }
 
     private static RetrieveResult containerViewByType(
+            final ServiceContent serviceContent,
+            final VimPortType vimPort,
             final ManagedObjectReference container,
             final String morefType,
             final RetrieveOptions retrieveOptions
     ) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
-        return containerViewByType(container, morefType, retrieveOptions, "name");
+        return containerViewByType(serviceContent, vimPort, container, morefType, retrieveOptions, "name");
     }
 
-    private static Map<String, ManagedObjectReference> toMap(RetrieveResult retrieveResult) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+    private static Map<String, ManagedObjectReference> toMap(
+            final ServiceContent serviceContent,
+            final VimPortType vimPort,
+            RetrieveResult retrieveResult) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
         final Map<String, ManagedObjectReference> tgetMoref = new HashMap<>();
         String token;
 
@@ -124,7 +146,7 @@ class VCHelper {
 
         while (token != null && !token.isEmpty()) {
             // 基于新token获取结果
-            retrieveResult = VCClientSession.getVimPort().continueRetrievePropertiesEx(VCClientSession.getServiceContent().getPropertyCollector(), token);
+            retrieveResult = vimPort.continueRetrievePropertiesEx(serviceContent.getPropertyCollector(), token);
             token = populate(retrieveResult, tgetMoref);
         }
         return tgetMoref;
@@ -158,8 +180,12 @@ class VCHelper {
         return token;
     }
 
-    static Map<String, ManagedObjectReference> inContainerByType(ManagedObjectReference container, String morefType) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
-        return inContainerByType(container, morefType, new RetrieveOptions());
+    static Map<String, ManagedObjectReference> inContainerByType(
+            final ServiceContent serviceContent,
+            final VimPortType vimPort,
+            final ManagedObjectReference container,
+            final String morefType) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+        return inContainerByType(serviceContent, vimPort, container, morefType, new RetrieveOptions());
     }
 
     /**
@@ -169,9 +195,11 @@ class VCHelper {
      * @throws InvalidPropertyFaultMsg 该属性不存在
      * @功能描述 检索当前MOR的属性
      */
-    static Map<String, Object> entityProps(ManagedObjectReference entityMor, String[] props)
-            throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
-
+    static Map<String, Object> entityProps(
+            final ServiceContent serviceContent,
+            final VimPortType vimPort,
+            final ManagedObjectReference entityMor,
+            final String[] props) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
         final HashMap<String, Object> retVal = new HashMap<>();
 
         // Create PropertyFilterSpec using the PropertySpec and ObjectPec
@@ -192,7 +220,7 @@ class VCHelper {
         };
 
         List<ObjectContent> oCont =
-                VCClientSession.getVimPort().retrievePropertiesEx(VCClientSession.getServiceContent().getPropertyCollector(),
+                vimPort.retrievePropertiesEx(serviceContent.getPropertyCollector(),
                         Arrays.asList(propertyFilterSpecs), new RetrieveOptions()).getObjects();
 
         if (oCont != null) {
@@ -207,8 +235,10 @@ class VCHelper {
     }
 
     static Map<ManagedObjectReference, Map<String, Object>> entityProps(
-            List<ManagedObjectReference> entityMors, String[] props)
-            throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+            final ServiceContent serviceContent,
+            final VimPortType vimPort,
+            final List<ManagedObjectReference> entityMors,
+            final String[] props) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
         Map<ManagedObjectReference, Map<String, Object>> retVal = new HashMap<>();
         // Create PropertyFilterSpec
         PropertyFilterSpecBuilder propertyFilterSpec = new PropertyFilterSpecBuilder();
@@ -235,20 +265,20 @@ class VCHelper {
         propertyFilterSpecs.add(propertyFilterSpec);
 
         RetrieveResult rslts =
-                VCClientSession.getVimPort().retrievePropertiesEx(VCClientSession.getServiceContent().getPropertyCollector(),
+                vimPort.retrievePropertiesEx(serviceContent.getPropertyCollector(),
                         propertyFilterSpecs, new RetrieveOptions());
 
-        List<ObjectContent> listobjcontent = new ArrayList<>();
-        String token = populate(rslts, listobjcontent);
+        List<ObjectContent> listObjectContent = new ArrayList<>();
+        String token = populate(rslts, listObjectContent);
         while (token != null && !token.isEmpty()) {
             rslts =
-                    VCClientSession.getVimPort().continueRetrievePropertiesEx(
-                            VCClientSession.getServiceContent().getPropertyCollector(), token);
+                    vimPort.continueRetrievePropertiesEx(
+                            serviceContent.getPropertyCollector(), token);
 
-            token = populate(rslts, listobjcontent);
+            token = populate(rslts, listObjectContent);
         }
 
-        for (ObjectContent oc : listobjcontent) {
+        for (ObjectContent oc : listObjectContent) {
             List<DynamicProperty> dps = oc.getPropSet();
             Map<String, Object> propMap = new HashMap<>();
             if (dps != null) {
@@ -267,10 +297,13 @@ class VCHelper {
      * @return 该虚拟机的MOR
      * @功能描述 通过虚拟机的名称获得该虚拟机的MOR
      */
-    static ManagedObjectReference vmByVmname(final String vmname, final ManagedObjectReference propCollectorRef) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
-
+    static ManagedObjectReference vmByVmname(
+            final ServiceContent serviceContent,
+            final VimPortType vimPort,
+            final String vmname,
+            final ManagedObjectReference propCollectorRef) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
         ManagedObjectReference retVal = null;
-        ManagedObjectReference rootFolder = VCClientSession.getServiceContent().getRootFolder();
+        ManagedObjectReference rootFolder = serviceContent.getRootFolder();
         TraversalSpec tSpec = getVMTraversalSpec();
         // Create Property Spec
         PropertySpec propertySpec = new PropertySpecBuilder()
@@ -296,7 +329,7 @@ class VCHelper {
 
         RetrieveOptions options = new RetrieveOptions();
         List<ObjectContent> listobcont =
-                VCClientSession.getVimPort().retrievePropertiesEx(propCollectorRef, listpfs, options).getObjects();
+                vimPort.retrievePropertiesEx(propCollectorRef, listpfs, options).getObjects();
 
         if (listobcont != null) {
             for (ObjectContent oc : listobcont) {

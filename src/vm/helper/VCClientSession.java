@@ -27,16 +27,21 @@ public class VCClientSession {
     // 记录所有连接的数目，只有当登录的所有方法全部结束时才断开连接
     // private static int logCounter = 0;
 
-    private static Logger logger = Logger.getLogger(VCClientSession.class);
-
     private static final String url = "https://10.251.0.20:8000/sdk";
     private static final String username = "administrator@vsphere.local";
     private static final String password = "@Vmware123";
+    private static Logger logger = Logger.getLogger(VCClientSession.class);
+    private static final String SVC_INST_NAME = "ServiceInstance";
 
-    private static final ManagedObjectReference SVC_INST_REF = new ManagedObjectReference();
-    private static VimService vimService;
+    private final ManagedObjectReference SVC_INST_REF = new ManagedObjectReference();
+    private VimService vimService;
+    private VimPortType vimPort;
+    private ServiceContent serviceContent;
+    private boolean isConnected = false;
+    private ManagedObjectReference perfManager;
+    private ManagedObjectReference propCollectorRef;
 
-    public static VimService getVimService() {
+    public VimService getVimService() {
         if (!isConnected) {
             try {
                 Connect();
@@ -47,9 +52,7 @@ public class VCClientSession {
         return vimService;
     }
 
-    private static VimPortType vimPort;
-
-    static VimPortType getVimPort() {
+    VimPortType getVimPort() {
         if (!isConnected) {
             try {
                 Connect();
@@ -60,9 +63,7 @@ public class VCClientSession {
         return vimPort;
     }
 
-    private static ServiceContent serviceContent;
-
-    static ServiceContent getServiceContent() {
+    ServiceContent getServiceContent() {
         if (!isConnected) {
             try {
                 Connect();
@@ -73,46 +74,15 @@ public class VCClientSession {
         return serviceContent;
     }
 
-    private static final String SVC_INST_NAME = "ServiceInstance";
-    private static boolean isConnected = false;
-
-    private static ManagedObjectReference perfManager;
-
-    public static ManagedObjectReference getPerfManager() {
+    public ManagedObjectReference getPerfManager() {
         return perfManager;
     }
 
-    private static ManagedObjectReference propCollectorRef;
-
-    public static ManagedObjectReference getPropCollectorRef() {
+    public ManagedObjectReference getPropCollectorRef() {
         return propCollectorRef;
     }
 
-    private static class TrustAllTrustManager implements javax.net.ssl.TrustManager, javax.net.ssl.X509TrustManager {
-
-        @Override
-        public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return null;
-        }
-
-        public boolean isServerTrusted(X509Certificate[] certs) {
-            return true;
-        }
-
-        public boolean isClientTrusted(java.security.cert.X509Certificate[] certs) {
-            return true;
-        }
-    }
-
-    private static void trustAllHttpsCertificates() throws NoSuchAlgorithmException, KeyManagementException {
+    private void trustAllHttpsCertificates() throws NoSuchAlgorithmException, KeyManagementException {
         TrustManager[] trustAllCerts = new TrustManager[1];
         TrustManager tm = new TrustAllTrustManager();
         trustAllCerts[0] = tm;
@@ -126,7 +96,7 @@ public class VCClientSession {
     /**
      * @功能描述 连接认证
      */
-    public static void Connect() throws RuntimeFaultFaultMsg, InvalidLoginFaultMsg, InvalidLocaleFaultMsg, KeyManagementException, NoSuchAlgorithmException {
+    void Connect() throws RuntimeFaultFaultMsg, InvalidLoginFaultMsg, InvalidLocaleFaultMsg, KeyManagementException, NoSuchAlgorithmException {
         //if(logCounter <= 0) {
         //    logCounter = 0;
         //}
@@ -161,7 +131,7 @@ public class VCClientSession {
     /**
      * @功能描述 断开连接
      */
-    public static void Disconnect() throws RuntimeFaultFaultMsg {
+    void Disconnect() throws RuntimeFaultFaultMsg {
         //logCounter--;
         if (isConnected) {
             vimPort.logout(serviceContent.getSessionManager());
@@ -175,7 +145,7 @@ public class VCClientSession {
     /**
      * @功能描述 打印错误信息
      */
-    private static void printSoapFaultException(SOAPFaultException sfe) {
+    private void printSoapFaultException(SOAPFaultException sfe) {
         logger.error("Soap fault: ");
         if (sfe.getFault().hasDetail()) {
             logger.error(sfe.getFault().getDetail().getFirstChild().getLocalName());
@@ -185,7 +155,7 @@ public class VCClientSession {
         }
     }
 
-    static Object[] WaitForValues(ManagedObjectReference objmor, String[] filterProps, String[] endWaitProps, Object[][] expectedVals) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg, InvalidCollectorVersionFaultMsg {
+    Object[] WaitForValues(ManagedObjectReference objmor, String[] filterProps, String[] endWaitProps, Object[][] expectedVals) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg, InvalidCollectorVersionFaultMsg {
         ManagedObjectReference filterSpecRef = null;
 
         // version string is initially null
@@ -302,6 +272,30 @@ public class VCClientSession {
                     vals[findi] = propchg.getVal();
                 }
             }
+        }
+    }
+
+    private static class TrustAllTrustManager implements javax.net.ssl.TrustManager, javax.net.ssl.X509TrustManager {
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+
+        public boolean isServerTrusted(X509Certificate[] certs) {
+            return true;
+        }
+
+        public boolean isClientTrusted(java.security.cert.X509Certificate[] certs) {
+            return true;
         }
     }
 }
